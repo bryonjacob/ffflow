@@ -1,0 +1,16 @@
+# cargo-nextest config — lives at .config/nextest.toml inside the project.
+
+[profile.default]
+# Print summary of slow tests
+slow-timeout = { period = "30s", terminate-after = 3 }
+# Retry flaky tests once (don't mask flakiness — failed retries still fail)
+retries = 0
+# Use all cores
+test-threads = "num-cpus"
+
+[profile.ci]
+# CI gets stricter settings
+fail-fast = false
+retries = 0
+slow-timeout = { period = "60s", terminate-after = 2 }
+junit = { path = "target/nextest/junit.xml" }

@@ -1,0 +1,37 @@
+set shell := ["bash", "-uc"]
+
+# List recipes
+default:
+    @just --list
+
+# Run a recipe in every subproject (expand the list at install time)
+all RECIPE:
+    cd backend && just {{RECIPE}}
+    cd frontend && just {{RECIPE}}
+
+# Aliases for common recipes
+test:    (all "test")
+lint:    (all "lint")
+format:  (all "format")
+coverage:(all "coverage")
+typecheck:(all "typecheck")
+
+check-all:
+    cd backend && just check-all
+    cd frontend && just check-all
+    @echo "All subprojects passed."
+
+dev-install:
+    cd backend && just dev-install
+    cd frontend && just dev-install
+
+# Subproject convenience targets
+backend RECIPE:
+    cd backend && just {{RECIPE}}
+
+frontend RECIPE:
+    cd frontend && just {{RECIPE}}
+
+clean:
+    cd backend && just clean
+    cd frontend && just clean

@@ -1,0 +1,9 @@
+# Additions for L2 — merge into pyproject.toml
+[project.optional-dependencies]
+dev = [
+  # L0 entries plus:
+  "pytest-bdd>=7.0", "pytest-bdd-property>=0.1", "hypothesis>=6.90",
+]
+
+[tool.pytest.ini_options]
+bdd_features_base_dir = "specs/"

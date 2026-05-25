@@ -1,0 +1,9 @@
+# Additions for L3 — merge into workspace Cargo.toml
+# cargo-mutants is a binary installed via `cargo install cargo-mutants`,
+# not a dev-dependency. specdrive likewise.
+#
+# Configuration for cargo-mutants lives in `.cargo/mutants.toml` (separate template).
+
+[package.metadata.mutants]
+exclude_globs = ["**/build.rs", "**/tests/**"]
+timeout_multiplier = 2.0

@@ -1,0 +1,11 @@
+# FFFlow Rust formatting standard.
+# Most defaults are good; pin the ones that matter.
+
+edition = "2021"
+max_width = 100
+tab_spaces = 4
+newline_style = "Unix"
+use_field_init_shorthand = true
+use_try_shorthand = true
+
+# Nightly-only options are intentionally omitted so rustfmt works on stable.

@@ -1,0 +1,7 @@
+# Additions for L2 — merge into workspace Cargo.toml [workspace.dependencies]
+# and each crate's [dev-dependencies] gets the workspace = true reference.
+
+[workspace.dependencies]
+proptest = "1.4"
+cucumber = "0.21"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }   # cucumber-rs uses async runner

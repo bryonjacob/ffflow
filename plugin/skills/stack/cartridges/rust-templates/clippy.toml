@@ -1,0 +1,15 @@
+# Cognitive complexity threshold — matches FFFlow's complexity_limit dimension.
+cognitive-complexity-threshold = 25
+
+# Type complexity — number of generic arguments before a type is "complex".
+type-complexity-threshold = 250
+
+# Discourage `unwrap()` in production paths; tests are exempt via cfg(test).
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+
+# Doc-comment quality
+missing-docs-in-crate-items = false       # Pedantic; flip on at L3 if RID traceability requires it.
+
+# Pull MSRV from Cargo.toml; don't suggest features newer than that.
+msrv = "1.75"

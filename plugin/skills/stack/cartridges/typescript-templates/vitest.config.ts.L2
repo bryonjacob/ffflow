@@ -1,0 +1,10 @@
+import { defineConfig } from 'vitest/config'
+import quickpickle from 'quickpickle'
+
+export default defineConfig({
+  plugins: [quickpickle()],
+  test: {
+    include: ['tests/**/*.test.ts', 'specs/**/*.feature'],
+    coverage: { provider: 'v8', thresholds: { lines: 95 } },
+  },
+})
