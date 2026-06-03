@@ -96,11 +96,17 @@ Configure once in `.ffflow/config.yaml`; the right cartridge loads when needed.
 
 ## Documentation
 
-- [Build spec & architecture](docs/architecture.md) — what the plugin is and why
-- [Levels explained](docs/levels.md) — the L0–L3 dial in detail
-- [Workflows](docs/workflows.md) — the lifecycle flows
-- [Audit subsystem](docs/audit.md) — the keep-honest layer
+- [Build spec & architecture](plugin/docs/architecture.md) — what the plugin is and why
+- [Levels explained](plugin/docs/levels.md) — the L0–L3 dial in detail
+- [Workflows](plugin/docs/workflows.md) — the lifecycle flows
+- [Audit subsystem](plugin/docs/audit.md) — the keep-honest layer
 
 ## Status
 
-Active development. See [`CLAUDE.md`](CLAUDE.md) for the build phase status.
+Active development. See [`plugin/CLAUDE.md`](plugin/CLAUDE.md) for the build phase status.
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE). Copyright 2026 Bryon Jacob.
+
+Contributions welcome. New stack cartridges (Go, Elixir, …), capture backends, and audit cartridges are the easiest ways to extend FFFlow without touching the core.
