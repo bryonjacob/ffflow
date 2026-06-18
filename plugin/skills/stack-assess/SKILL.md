@@ -45,7 +45,7 @@ For each dimension active at the configured level:
 - **bdd_runner (L2+)**: installed? `specs/` directory exists?
 - **property_runner (L2+)**: installed? any `@property-based` scenarios?
 - **mutation_tool (L3)**: installed? `mutate` recipe in justfile?
-- **spec_audit_cli (L3)**: `specdrive` available? `spec-audit` recipe?
+- **spec_audit_cli (L3)**: `npx specdrive` resolvable (Node/npm present)? `spec-audit` recipe in justfile? specdrive is a language-agnostic CLI run via npx on every stack — a missing-specdrive gap is "install Node," never "this stack can't do L3."
 
 Mark each as `OK`, `missing`, `misconfigured`, or `lower-than-floor`.
 

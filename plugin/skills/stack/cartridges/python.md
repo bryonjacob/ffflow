@@ -4,15 +4,11 @@
 
 Declare the canonical Python toolchain for FFFlow projects and provide level-aware defaults. Loaded by `init-ffflow` and `stack-init` for tool detection and config generation.
 
-## Maximum level: L2 (until specdrive ships for Python)
+## Maximum level: L3
 
-**Python projects can adopt FFFlow at L0, L1, or L2 — not L3.** FFFlow's L3 RID-traceability gate is implemented by [`specdrive`](https://github.com/specdrive/specdrive), which currently only ships as an npm package (no PyPI publication). Mutation testing via `mutmut` works at L3, but the `spec-audit` recipe and the `rid` cartridge of `/fff:audit` cannot engage against Python code.
+**Python projects can adopt FFFlow at any level, L0 through L3.** FFFlow's L3 RID-traceability gate is implemented by [`specdrive`](https://github.com/bryonjacob/specdrive), a language-agnostic CLI. It operates on Gherkin `.feature` files and JUnit XML test output — both universal formats — so it audits a Python project exactly as it audits a TypeScript one. specdrive is distributed via npm, but that is its *install channel*, not a constraint on what it can audit: you run it via `npx specdrive` (or a globally/locally installed `specdrive`) alongside `uv`, the same way you'd reach for any external CLI dev tool. Mutation testing via `mutmut` rounds out the L3 gates.
 
-- **Python-only projects:** `init-ffflow` will refuse `level: L3` for stack `python`. Pick L2.
-- **Polyglot projects with a Python subproject:** declare `level_override: L2` on the Python subproject in `.ffflow/config.yaml`.
-- **Workaround for "I want L3 anyway":** mutation testing with `mutmut` still works; you'll get the structural and coverage gates. The RID traceability gate is what's missing.
-
-If a Python distribution of specdrive lands later, this restriction will be relaxed. The cartridge declares `max_level: L2` in its dimensions block to make the gap explicit to tooling.
+The only prerequisite for L3 on Python is that Node.js/npm is available to run specdrive (it ships no Python wheel — and doesn't need one). `stack-init` checks for `npx` at L3 and tells you to install Node if it's missing.
 
 ## Dimensions
 
@@ -21,7 +17,7 @@ The stack's declared shape. Other skills (and `.ffflow/stack.yaml` overrides) re
 ```yaml
 stack: python
 applies_to: python
-max_level: L2                          # specdrive has no PyPI publication
+max_level: L3
 dimensions:
   package_manager: { tool: uv, version: ">=0.4" }
   formatter: { tool: ruff, command: "ruff format" }
@@ -36,10 +32,10 @@ dimensions:
   bdd_runner: { tool: pytest-bdd, when: "level >= L2" }
   property_runner: { tool: hypothesis, when: "level >= L2" }
   bdd_property: { tool: pytest-bdd-property, when: "level >= L2" }
-  # L3 partially supported — mutation works, spec-audit does not
+  # L3
   mutation_tool: { tool: mutmut, when: "level == L3" }
   mutation_threshold: 80
-  spec_audit_cli: { tool: specdrive, when: "level == L3", supported: false }
+  spec_audit_cli: { tool: specdrive, when: "level == L3", via: "npx" }  # language-agnostic CLI; needs Node/npm
 ```
 
 `.ffflow/stack.yaml` can override any dimension.
@@ -50,8 +46,8 @@ dimensions:
 |---|---|---|
 | L0 | uv, ruff, mypy, pytest, coverage.py | Prose specs in `docs/specs/`. Threshold 95% optional. |
 | L1 | + hexagonal layout | Same tools; layout matters. |
-| L2 | + pytest-bdd + Hypothesis + pytest-bdd-property | `.feature` files in `specs/`. **Max level for Python today.** |
-| L3 | (not supported) | specdrive has no PyPI publication. See note above. |
+| L2 | + pytest-bdd + Hypothesis + pytest-bdd-property | `.feature` files in `specs/`. |
+| L3 | + mutmut + specdrive (via npx) | RID traceability + mutation testing. Requires Node/npm for specdrive. |
 
 ## Directory structure
 
@@ -155,8 +151,12 @@ L3 additions:
 mutate:
     uv run mutmut run --paths-to-mutate=src/
 
+# specdrive is a language-agnostic CLI distributed on npm; it audits the
+# Gherkin specs + JUnit XML, not Python source, so it runs via npx rather
+# than uv. Pin the version in package.json (or use `npx specdrive@<ver>`)
+# for reproducibility.
 spec-audit:
-    uv run specdrive audit
+    npx specdrive audit
 ```
 
 And `check-all` extends to include the active gates.
@@ -169,7 +169,7 @@ Templates live in `templates/`. `stack-init` merges them per level:
 |---|---|---|
 | `pyproject.toml` | `templates/pyproject.toml.L0` | L0/L1 baseline |
 | `pyproject.toml` (merge) | `templates/pyproject.toml.L2-additions.toml` | L2+ adds pytest-bdd, hypothesis |
-| `pyproject.toml` (merge) | `templates/pyproject.toml.L3-additions.toml` | L3 adds mutmut, specdrive |
+| `pyproject.toml` (merge) | `templates/pyproject.toml.L3-additions.toml` | L3 adds mutmut (specdrive comes via npx, not pyproject) |
 
 ## Dual coverage (L2+)
 
@@ -182,7 +182,7 @@ Unit coverage measures code correctness. Spec coverage measures behavioral contr
 - pytest-bdd maps Gherkin steps to Python functions. Standard pytest execution.
 - pytest-bdd-property handles `@property-based` tagged scenarios via Hypothesis.
 - mutmut validates test strength. Cadence rule lives in `justfile` (mutate not in check-all; schedule it).
-- specdrive audit checks RID traceability. Run in CI when L3.
+- specdrive audit checks RID traceability. It's a language-agnostic CLI run via `npx specdrive` — it reads the `.feature` specs and JUnit XML, so it works identically on Python and TypeScript projects. Run in CI when L3 (the CI job needs a Node setup step alongside the Python one).
 - `--durations=10` monitors test performance. Keep unit tests under 5s total.
 
 ## Anti-patterns

@@ -4,22 +4,18 @@
 
 Declare the canonical Java toolchain for FFFlow projects. Loaded by `init-ffflow` and `stack-init`.
 
-## Maximum level: L2 (until specdrive ships for Java)
+## Maximum level: L3
 
-**Java projects can adopt FFFlow at L0, L1, or L2 — not L3.** FFFlow's L3 RID-traceability gate is implemented by [`specdrive`](https://github.com/specdrive/specdrive), which currently only ships as an npm package (no Maven Central publication). Mutation testing via PIT works at L3, but the `spec-audit` recipe and the `rid` cartridge of `/fff:audit` cannot engage against Java code.
+**Java projects can adopt FFFlow at any level, L0 through L3.** FFFlow's L3 RID-traceability gate is implemented by [`specdrive`](https://github.com/bryonjacob/specdrive), a language-agnostic CLI. It operates on Gherkin `.feature` files and JUnit XML test output — both universal formats — so it audits a Java project exactly as it audits a TypeScript one. specdrive is distributed via npm, but that is its *install channel*, not a constraint on what it can audit: you run it via `npx specdrive` (no Maven Central publication is needed — specdrive never touches your Java build). Mutation testing via PIT rounds out the L3 gates.
 
-- **Java-only projects:** `init-ffflow` will refuse `level: L3` for stack `java`. Pick L2.
-- **Polyglot projects with a Java subproject:** declare `level_override: L2` on the Java subproject in `.ffflow/config.yaml`.
-- **Workaround for "I want L3 anyway":** PIT mutation testing still works; you'll get the structural and coverage gates. The RID traceability gate is what's missing.
-
-If a Java distribution of specdrive lands later, this restriction will be relaxed.
+The only prerequisite for L3 on Java is that Node.js/npm is available to run specdrive. `stack-init` checks for `npx` at L3 and tells you to install Node if it's missing.
 
 ## Dimensions
 
 ```yaml
 stack: java
 applies_to: java
-max_level: L2                          # specdrive has no Maven Central publication
+max_level: L3
 dimensions:
   build_tool: { tool: maven, version: ">=3.9" }
   formatter: { tool: spotless, plugin: "com.diffplug.spotless:spotless-maven-plugin" }
@@ -32,10 +28,10 @@ dimensions:
   # L2+
   bdd_runner: { tool: cucumber-jvm, when: "level >= L2" }
   property_runner: { tool: jqwik, when: "level >= L2" }
-  # L3 partially supported — mutation works, spec-audit does not
+  # L3
   mutation_tool: { tool: pitest, when: "level == L3" }
   mutation_threshold: 80
-  spec_audit_cli: { tool: specdrive, when: "level == L3", supported: false }
+  spec_audit_cli: { tool: specdrive, when: "level == L3", via: "npx" }  # language-agnostic CLI; needs Node/npm
 ```
 
 `.ffflow/stack.yaml` can override any dimension.
@@ -46,8 +42,8 @@ dimensions:
 |---|---|
 | L0 | Maven, Spotless, SpotBugs, JUnit 5, JaCoCo |
 | L1 | + hexagonal layout |
-| L2 | + Cucumber JVM + jqwik (property-based). **Max level for Java today.** |
-| L3 | (not supported) | specdrive has no Maven Central publication. |
+| L2 | + Cucumber JVM + jqwik (property-based) |
+| L3 | + PIT mutation + specdrive (via npx). Requires Node/npm for specdrive. |
 
 ## Directory structure
 
@@ -69,7 +65,7 @@ project-root/
 L0 baseline lives in `templates/pom.xml.L0`. `stack-init` merges it into the project's `pom.xml`.
 
 L2 adds: `cucumber-java`, `cucumber-junit-platform-engine`, `jqwik`.
-L3 adds: `pitest-maven-plugin`, `specdrive` (if a Java distribution exists; otherwise call the CLI from the justfile).
+L3 adds: `pitest-maven-plugin`. specdrive is *not* a Maven dependency — it's a language-agnostic CLI run via `npx specdrive` from the justfile (it reads the Gherkin specs + JUnit XML, not the Java build).
 
 ## Justfile recipes
 
@@ -133,8 +129,10 @@ L3 adds:
 mutate:
     mvn -q org.pitest:pitest-maven:mutationCoverage
 
+# specdrive is a language-agnostic CLI distributed on npm; it audits the
+# Gherkin specs + JUnit XML, not the Java build, so it runs via npx.
 spec-audit:
-    specdrive audit
+    npx specdrive audit
 ```
 
 ## Dual coverage (L2+)

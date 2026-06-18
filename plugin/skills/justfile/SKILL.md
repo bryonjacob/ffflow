@@ -88,9 +88,11 @@ check-all: format lint typecheck coverage spec-coverage
 **L3 recipes:**
 
 ```just
-# Run spec traceability audit (RID/specdrive)
+# Run spec traceability audit (RID/specdrive).
+# specdrive is a language-agnostic CLI on npm — same invocation on every stack.
+# TypeScript projects may use `pnpm specdrive audit`; all others use `npx specdrive audit`.
 spec-audit:
-    <specdrive audit>
+    <npx specdrive audit  (or `pnpm specdrive audit` on TypeScript)>
 
 # Run mutation testing
 mutate:

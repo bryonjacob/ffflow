@@ -165,7 +165,26 @@ Same structure; replace steps:
 | 1 | `pnpm prettier --check` + `pnpm eslint` + `pnpm tsc --noEmit` | `uv run ruff format --check` + `uv run ruff check` + `uv run mypy src` |
 | 2 | `pnpm vitest run tests` | `uv run pytest tests` |
 | 3 | `pnpm vitest --coverage` | `uv run pytest --cov` |
-| 4 (L3 weekly) | `pnpm stryker run` | `uv run mutmut run` |
+| 4 (L3 weekly, mutation) | `pnpm stryker run` | `uv run mutmut run` |
+| 4 (L3 weekly, RID audit) | `pnpm specdrive audit` | `npx specdrive audit` |
+
+The RID-audit step is the **same tool** on both — specdrive is a language-agnostic CLI run via npm. On a Python (or Java/Rust) project the weekly L3 job needs a Node setup step so `npx specdrive` resolves:
+
+```yaml
+  mutation-weekly:                       # Python L3 weekly job
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - uses: actions/setup-node@v4       # needed for npx specdrive
+        with: { node-version: '20' }
+      - run: uv sync
+      - name: mutmut
+        run: uv run mutmut run
+      - name: specdrive audit (RID)
+        run: npx specdrive audit
+```
 
 ## Branch protection
 

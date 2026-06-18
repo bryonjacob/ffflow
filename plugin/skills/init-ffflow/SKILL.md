@@ -98,23 +98,20 @@ When the user picks L2 or L3, flip the corresponding entries in `features:` auto
 
 ### 2a. Honor the cartridge's `max_level`
 
-Before writing the config, check the chosen stack cartridge for a `max_level:` declaration. Today, `python`, `java`, and `rust` cartridges all declare `max_level: L2` because [`specdrive`](https://github.com/specdrive/specdrive) is npm-only — there's no PyPI / Maven Central / crates.io publication.
+Before writing the config, check the chosen stack cartridge for a `max_level:` declaration. All current cartridges — `typescript`, `python`, `java`, `rust` — declare `max_level: L3`. Every supported stack reaches every level.
 
-If the user picked a level above the cartridge's max:
+specdrive (the L3 RID-traceability tool) is a **language-agnostic CLI**: it audits Gherkin `.feature` files and JUnit XML, not your source, and is distributed on npm. So L3 on a Python/Java/Rust project just needs Node/npm available to run `npx specdrive` — there is no PyPI / Maven Central / crates.io requirement, and no reason to cap these stacks at L2. (`stack-init` checks for `npx` at L3 and prompts to install Node if it's missing.)
+
+If a cartridge ever *does* declare a `max_level` below the user's chosen level, and the user picked a level above that max, surface it:
 
 ```
-Heads up: the `<stack>` cartridge declares max_level: L2.
-
-L3 requires specdrive (RID traceability tool), which only ships on npm today.
-Your options:
-  1. Drop to L2 — full mutation testing + spec audit; no RID gate.
-  2. Use polyglot with a TypeScript subproject and put the L3 surface there.
-  3. Proceed with L3 anyway — spec-audit will skip silently. Mutation works.
-
-Pick 1, 2, or 3?
+Heads up: the `<stack>` cartridge declares max_level: <max>.
+Drop to <max>, or pick a stack that supports the level you want?
 ```
 
-For **polyglot** stacks: each subproject inherits its own cartridge's max_level. If the project-level config says L3 but one subproject's cartridge tops out at L2, surface the subprojects that will need a `level_override` and ask the user to confirm the per-subproject levels.
+But do not invent such a cap for `python`, `java`, or `rust` — they are L3-capable.
+
+For **polyglot** stacks: each subproject inherits its own cartridge's max_level. Since all current cartridges are L3-capable, a polyglot L3 project needs no per-subproject downgrade on this account; only surface `level_override` prompts if a cartridge actually declares a lower max.
 
 ### 3. Write the config
 
