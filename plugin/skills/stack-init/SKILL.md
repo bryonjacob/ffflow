@@ -93,6 +93,18 @@ Apply in this order:
 
 1. Stack config files (so language tooling can find its config).
 2. Install dependencies (`uv pip install -e ".[dev]"` or `pnpm install`).
+   - **At L3, also verify `npx` is on PATH** (`npx --version`). specdrive — the RID-traceability CLI — is a language-agnostic tool distributed on npm and run via `npx specdrive`, regardless of the project's stack. It audits the Gherkin specs + JUnit XML, not the source, so a Python/Java/Rust project needs Node/npm available *only* to run specdrive. If `npx` is missing, surface:
+
+     ```
+     L3 needs specdrive for the RID-traceability gate. specdrive is a
+     language-agnostic CLI run via `npx specdrive` — it audits your .feature
+     specs, not your <stack> source — so it needs Node.js/npm on PATH.
+
+     Install Node (e.g. via your package manager or nvm), then re-run.
+     This is the only Node dependency L3 adds to a non-JS project.
+     ```
+
+     Do not treat this as a reason to drop the project below L3 — install Node instead. (For TypeScript projects `npx`/`pnpm` is already present.)
 3. Spec directory.
 4. Justfile (sourced from the `justfile` skill — baseline + tier cartridges).
 5. Git hooks (via `git-hooks`).

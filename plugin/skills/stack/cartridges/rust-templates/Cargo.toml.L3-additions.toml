@@ -1,6 +1,7 @@
 # Additions for L3 — merge into workspace Cargo.toml
 # cargo-mutants is a binary installed via `cargo install cargo-mutants`,
-# not a dev-dependency. specdrive likewise.
+# not a dev-dependency. specdrive is a language-agnostic CLI run via
+# `npx specdrive` (npm, not Cargo) — it audits the Gherkin specs + JUnit XML.
 #
 # Configuration for cargo-mutants lives in `.cargo/mutants.toml` (separate template).
 

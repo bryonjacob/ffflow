@@ -1,12 +1,11 @@
 # Additions for L3 — merge into pyproject.toml
 #
-# NOTE: specdrive is pre-1.0 and not currently published on PyPI (only npm).
-# Python projects at L3 will need to skip spec-audit until specdrive ships
-# a Python distribution. See python.md cartridge note on max_level. The line
-# below is left commented as a placeholder for when specdrive lands.
+# specdrive is NOT a Python dependency. It's a language-agnostic CLI distributed
+# on npm that audits the Gherkin specs + JUnit XML (not Python source), so it's
+# run via `npx specdrive audit` from the justfile — see the python.md cartridge.
+# Only the Python-native L3 tool (mutmut) belongs here.
 [project.optional-dependencies]
 dev = [
   # L0+L2 entries plus:
   "mutmut>=2.4",
-  # "specdrive>=0.1",  # not yet on PyPI
 ]

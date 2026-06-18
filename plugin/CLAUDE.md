@@ -87,6 +87,6 @@ When authoring or editing skills, enforce these. Full text in `docs/architecture
 ## Related projects
 
 - **ffflow** — Methodology documentation and examples
-- **specdrive** — CLI for Gherkin behavioral contract management (used by `/audit --type rid` at L3)
+- **specdrive** — [language-agnostic CLI](https://github.com/bryonjacob/specdrive) for Gherkin behavioral contract management (used by `/audit --type rid` at L3). Distributed on npm and run via `npx specdrive`; audits `.feature` files + JUnit XML, so it works for any stack (Python, Java, Rust, TypeScript) — npm is its install channel, not a language constraint.
 - **quickpickle-property** — BDD+PBT plugin for TypeScript (L2+ TypeScript stacks)
 - **pytest-bdd-property** — BDD+PBT plugin for Python (L2+ Python stacks)

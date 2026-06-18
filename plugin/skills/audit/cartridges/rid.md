@@ -9,7 +9,7 @@ Only runs at L3. At lower levels, this skill no-ops (returns `not_applicable`).
 ## Prerequisites
 
 - `.ffflow/config.yaml` shows `level: L3` and `features.rid_traceability: true`.
-- `specdrive` CLI installed (managed by the stack skill at L3).
+- `specdrive` reachable (it's a language-agnostic CLI run via `npx specdrive`; needs Node/npm on PATH regardless of the project's stack). Provisioned by the stack skill at L3.
 - A `.feature` corpus with RID tags per `rid-traceability` skill.
 
 ## Inputs
@@ -54,19 +54,21 @@ If level ≠ L3, return:
 ### 2. Run
 
 ```bash
-specdrive audit --json
+npx specdrive audit --json
 ```
 
-(Or `specdrive audit --json --changed-only` if `--changed-only` was passed.)
+(Or `npx specdrive audit --json --changed-only` if `--changed-only` was passed.)
 
-If `specdrive` is not installed, return:
+Run via `npx` so the same invocation works on every stack — specdrive audits the Gherkin specs + JUnit XML, not the project's source language. If the justfile defines a `spec-audit` recipe, prefer `just spec-audit` to honor any project-pinned version.
+
+If `specdrive` can't run (Node/npm missing, or specdrive not resolvable), return:
 ```json
 {
   "auditor": "audit-rid",
   "status": "fail",
   "findings": [{
     "severity": "high",
-    "summary": "specdrive CLI not available. Install via your stack skill.",
+    "summary": "specdrive CLI not available. Ensure Node/npm is installed (specdrive runs via npx); the stack skill provisions it at L3.",
     "auto_fixable": false
   }]
 }

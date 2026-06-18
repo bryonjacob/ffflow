@@ -4,15 +4,11 @@
 
 Declare the canonical Rust toolchain for FFFlow projects and provide level-aware defaults. Loaded by `init-ffflow` and `stack-init` for tool detection and config generation.
 
-## Maximum level: L2 (until specdrive ships for Rust)
+## Maximum level: L3
 
-**Rust projects can adopt FFFlow at L0, L1, or L2 — not L3.** FFFlow's L3 RID-traceability gate is implemented by [`specdrive`](https://github.com/specdrive/specdrive), which currently only ships as an npm package (no crates.io publication). Without a Rust adapter, the `spec-audit` recipe and the `rid` cartridge of `/fff:audit` cannot engage against Rust code.
+**Rust projects can adopt FFFlow at any level, L0 through L3.** FFFlow's L3 RID-traceability gate is implemented by [`specdrive`](https://github.com/bryonjacob/specdrive), a language-agnostic CLI. It operates on Gherkin `.feature` files and JUnit XML test output — both universal formats — so it audits a Rust project exactly as it audits a TypeScript one. specdrive is distributed via npm, but that is its *install channel*, not a constraint on what it can audit: you run it via `npx specdrive` (no crates.io publication is needed — specdrive never touches Cargo). Mutation testing via `cargo-mutants` rounds out the L3 gates.
 
-- **Rust-only projects:** `init-ffflow` will refuse `level: L3` for stack `rust`. Pick L2.
-- **Polyglot projects with a Rust subproject:** declare `level_override: L2` on the Rust subproject in `.ffflow/config.yaml`. Other subprojects (TypeScript, Python, Java) can be at their own level.
-- **Workaround for "I want L3 anyway":** mutation testing with `cargo-mutants` still works; you'll get the structural and coverage gates. The RID traceability gate is what's missing.
-
-If a Rust adapter for specdrive lands later, this restriction will be relaxed. The cartridge declares `max_level: L2` in its dimensions block to make the gap explicit to tooling.
+The only prerequisite for L3 on Rust is that Node.js/npm is available to run specdrive. `stack-init` checks for `npx` at L3 and tells you to install Node if it's missing.
 
 ## Dimensions
 
@@ -21,7 +17,7 @@ The stack's declared shape. Other skills (and `.ffflow/stack.yaml` overrides) re
 ```yaml
 stack: rust
 applies_to: rust
-max_level: L2                                     # specdrive has no crates.io publication
+max_level: L3
 dimensions:
   package_manager: { tool: cargo, version: ">=1.75" }
   formatter: { tool: rustfmt, command: "cargo fmt" }
@@ -36,10 +32,10 @@ dimensions:
   bdd_runner: { tool: cucumber-rs, when: "level >= L2" }
   property_runner: { tool: proptest, when: "level >= L2" }
   bdd_property: { tool: cucumber-rs+proptest, when: "level >= L2" }
-  # L3 not currently supported — see "Maximum level" note above
-  mutation_tool: { tool: cargo-mutants, when: "level == L3", supported: false }
+  # L3
+  mutation_tool: { tool: cargo-mutants, when: "level == L3" }
   mutation_threshold: 80
-  spec_audit_cli: { tool: specdrive, when: "level == L3", supported: false }
+  spec_audit_cli: { tool: specdrive, when: "level == L3", via: "npx" }  # language-agnostic CLI; needs Node/npm
 ```
 
 `.ffflow/stack.yaml` can override any dimension.
@@ -50,8 +46,8 @@ dimensions:
 |---|---|---|
 | L0 | cargo, rustfmt, clippy, cargo-nextest, cargo-llvm-cov | Prose specs in `docs/specs/`. Threshold 95% optional. |
 | L1 | + hexagonal layout (crate-per-bounded-context recommended) | Same tools; layout matters. |
-| L2 | + cucumber-rs + proptest | `.feature` files in `specs/`. **Max level for Rust today.** |
-| L3 | (not supported) | specdrive has no crates.io publication. See note above. |
+| L2 | + cucumber-rs + proptest | `.feature` files in `specs/`. |
+| L3 | + cargo-mutants + specdrive (via npx) | RID traceability + mutation testing. Requires Node/npm for specdrive. |
 
 ## Workspace vs single crate
 
@@ -169,8 +165,10 @@ L3 additions:
 mutate:
     cargo mutants --workspace --no-shuffle --timeout-multiplier 2.0
 
+# specdrive is a language-agnostic CLI distributed on npm; it audits the
+# Gherkin specs + JUnit XML, not Cargo, so it runs via npx.
 spec-audit:
-    specdrive audit
+    npx specdrive audit
 ```
 
 And `check-all` extends to include the active gates (no `mutate` in `check-all` — slow gates kill the loop; cadence rule per the `justfile` skill).
@@ -208,7 +206,7 @@ Unit coverage measures code correctness. Spec coverage measures behavioral contr
 - **cucumber-rs** is the canonical Rust BDD runner. It plugs into Cargo's test harness via a `tests/cucumber.rs` shim — keep step definitions in a separate `tests/steps/` module so domain glue stays separate from infrastructure glue.
 - **proptest** is the canonical property-based testing crate (over `quickcheck` — proptest's shrinking is materially better). At L2+, `@property-based` Gherkin scenarios route to proptest via cucumber-rs's regex-step + proptest's `Strategy` integration.
 - **cargo-mutants** validates test strength. Cadence rule lives in `justfile` (mutate not in check-all; schedule it).
-- **specdrive audit** checks RID traceability. Run in CI when L3.
+- **specdrive audit** checks RID traceability. It's a language-agnostic CLI run via `npx specdrive` — it reads the `.feature` specs and JUnit XML, so it works identically on Rust and TypeScript projects. Run in CI when L3 (the CI job needs a Node setup step alongside the Rust one).
 - Edition: pin to `edition = "2021"` (or "2024" when stable). Don't auto-upgrade — that's a deliberate project decision.
 - MSRV (Minimum Supported Rust Version): declare `rust-version = "1.75"` in workspace `Cargo.toml`. Audit checks freshness.
 

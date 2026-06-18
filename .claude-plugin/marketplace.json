@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "FFFlow — a complete development lifecycle plugin for Claude Code (plan, work, audit), scaling L0 to L3.",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "license": "Apache-2.0"
   },
   "plugins": [
@@ -14,7 +14,7 @@
       "name": "fff",
       "source": "./plugin",
       "description": "FFFlow — plan, work, and audit in one Claude Code plugin. L0 prose through L3 RID traceability + mutation testing.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "category": "development",
       "keywords": ["bdd", "tdd", "gherkin", "hexagonal", "specification", "testing", "traceability", "mutation-testing", "planning", "audit"]
     }
