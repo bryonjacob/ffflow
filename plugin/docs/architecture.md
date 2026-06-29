@@ -570,6 +570,8 @@ Folded into one `justfile` skill with tier cartridges. Folds aug-just in as FFFl
 - `cartridges/tier-3-advanced.md` — deploy, migrate, logs, status.
 - `cartridges/tier-4-polyglot.md` — multi-language recipe extensions (the structural shape lives in `stack/cartridges/polyglot.md`).
 
+**Concept/language split.** Each tier file describes the language-agnostic concept (recipe list, rules, anti-patterns) and indexes per-stack recipe bodies under a sibling folder of the same stem — e.g. `cartridges/tier-1-quality/{python,typescript,java,rust}.md`. Adding a language is one new file per tier it touches; the concept file never grows. This keeps the cartridge set O(concepts), not O(concepts × languages), and matches the one-file-per-language axis already used in `stack/cartridges/`. Tier 4 has no per-language bodies (it delegates structure to the polyglot stack cartridge), so it has no folder.
+
 **Terminology:** "Level" (L0–L3) = FFFlow methodology rigor. "Tier" (0–4) = justfile maturity. Orthogonal dials.
 
 ### 5.11 Supporting tools

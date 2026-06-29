@@ -30,55 +30,17 @@ status ENV='local':
     <kubectl get / docker ps / cloud-provider tool>
 ```
 
-## Per-stack hints
+## Per-language hints
 
-### Python
+Tier 3 recipes are highly project-specific; the per-stack files carry starting hints, not turnkey recipes. They live in one file per stack under `tier-3-advanced/`. Load only the file for the stack you're activating — the concept (this file) stays language-agnostic.
 
-```just
-test-smart:
-    uv run pytest --testmon  # incremental test runner
+| Stack | Detail file |
+|---|---|
+| Python | [`tier-3-advanced/python.md`](tier-3-advanced/python.md) |
+| TypeScript | [`tier-3-advanced/typescript.md`](tier-3-advanced/typescript.md) |
+| Java | [`tier-3-advanced/java.md`](tier-3-advanced/java.md) |
 
-migrate:
-    uv run alembic upgrade head      # or django migrate, etc.
-
-deploy ENV:
-    uv build
-    docker build -t myapp:$(git rev-parse HEAD) .
-    docker push myapp:$(git rev-parse HEAD)
-    kubectl --context={{ENV}} rollout restart deployment/myapp
-```
-
-### TypeScript
-
-```just
-test-smart:
-    pnpm vitest run --changed origin/main
-
-migrate:
-    pnpm prisma migrate deploy
-
-deploy ENV:
-    pnpm build
-    docker build -t myapp:$(git rev-parse HEAD) .
-    docker push myapp:$(git rev-parse HEAD)
-    kubectl --context={{ENV}} rollout restart deployment/myapp
-```
-
-### Java
-
-```just
-test-smart:
-    mvn -q test -Dtest=$(git diff --name-only origin/main | grep Test.java | xargs -n1 basename)
-
-migrate:
-    mvn -q liquibase:update
-
-deploy ENV:
-    mvn -q package
-    docker build -t myapp:$(git rev-parse HEAD) .
-    docker push myapp:$(git rev-parse HEAD)
-    kubectl --context={{ENV}} rollout restart deployment/myapp
-```
+Rust hints are not yet written; the recipe shape and rules above apply unchanged (cargo build + container + `kubectl rollout`, `cargo sqlx migrate` or similar). Adding a stack = add one file in `tier-3-advanced/`; do not edit this concept file.
 
 ## Rules
 

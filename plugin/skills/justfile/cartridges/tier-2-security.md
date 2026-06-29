@@ -24,92 +24,18 @@ doctor:
     <validate dev environment>
 ```
 
-## Per-stack implementations
+## Per-language implementations
 
-### Python
+The recipe bodies live in one file per stack under `tier-2-security/`. Load only the file for the stack you're activating — the concept (this file) stays language-agnostic.
 
-```just
-vulns:
-    uv run pip-audit --severity-threshold critical --fix
+| Stack | Detail file |
+|---|---|
+| Python | [`tier-2-security/python.md`](tier-2-security/python.md) |
+| TypeScript | [`tier-2-security/typescript.md`](tier-2-security/typescript.md) |
+| Java | [`tier-2-security/java.md`](tier-2-security/java.md) |
+| Rust | [`tier-2-security/rust.md`](tier-2-security/rust.md) |
 
-lic:
-    uv run pip-licenses --format=markdown --fail-on='GPL;LGPL;AGPL'
-
-sbom:
-    uv run cyclonedx-py -o sbom.json
-
-doctor:
-    @python --version
-    @uv --version
-    @just --version
-    @command -v ruff && ruff --version
-    @command -v mypy && mypy --version
-    @echo "Environment OK"
-```
-
-### TypeScript
-
-```just
-vulns:
-    pnpm audit --audit-level critical --fix
-
-lic:
-    pnpm dlx license-checker --failOn 'GPL-3.0;LGPL-3.0;AGPL-3.0'
-
-sbom:
-    pnpm dlx @cyclonedx/cyclonedx-npm --output-file sbom.json
-
-doctor:
-    @node --version
-    @pnpm --version
-    @just --version
-    @command -v tsc && tsc --version
-    @echo "Environment OK"
-```
-
-### Java
-
-```just
-vulns:
-    mvn -q org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=9
-
-lic:
-    mvn -q license:check
-
-sbom:
-    mvn -q org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom
-
-doctor:
-    @java -version
-    @mvn --version
-    @just --version
-    @echo "Environment OK"
-```
-
-### Rust
-
-`cargo-deny` covers vulnerabilities, licenses, and dependency policy in one tool. Config lives in `deny.toml` at the workspace root (the `stack` skill's `rust.md` cartridge supplies the template).
-
-```just
-vulns:
-    cargo deny check advisories
-
-lic:
-    cargo deny check licenses
-
-sbom:
-    cargo cyclonedx --format json --output-pattern bom
-
-doctor:
-    @rustc --version
-    @cargo --version
-    @cargo nextest --version 2>/dev/null || echo "(cargo-nextest not installed)"
-    @cargo llvm-cov --version 2>/dev/null || echo "(cargo-llvm-cov not installed)"
-    @just --version
-    @echo "Environment OK"
-```
-
-Install: `cargo install --locked cargo-deny cargo-cyclonedx`.
+Adding a stack = add one file in `tier-2-security/`; do not edit this concept file.
 
 ## Rules
 

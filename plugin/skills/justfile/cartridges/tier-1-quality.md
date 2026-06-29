@@ -32,73 +32,18 @@ slowtests:
     <run with duration profiling>
 ```
 
-## Per-stack implementations
+## Per-language implementations
 
-### Python
+The recipe bodies live in one file per stack under `tier-1-quality/`. Load only the file for the stack you're activating — the concept (this file) stays language-agnostic.
 
-```just
-test-watch:
-    uv run pytest-watch tests/ -- -v
+| Stack | Detail file |
+|---|---|
+| Python | [`tier-1-quality/python.md`](tier-1-quality/python.md) |
+| TypeScript | [`tier-1-quality/typescript.md`](tier-1-quality/typescript.md) |
+| Java | [`tier-1-quality/java.md`](tier-1-quality/java.md) |
+| Rust | [`tier-1-quality/rust.md`](tier-1-quality/rust.md) |
 
-integration-test:
-    uv run pytest tests/integration -v
-
-complexity:
-    uv run radon cc src --total-average
-
-loc:
-    @find src -name "*.py" -exec wc -l {} + | sort -rn | head -20
-
-duplicates:
-    uv run pylint --disable=all --enable=R0801 src
-
-slowtests:
-    uv run pytest --durations=0 -v | head -50
-```
-
-### TypeScript
-
-```just
-test-watch:
-    pnpm vitest tests
-
-integration-test:
-    pnpm vitest run tests/integration
-
-complexity:
-    pnpm eslint src --rule 'complexity: [warn, 10]' --no-eslintrc
-
-loc:
-    @find src -name "*.ts" -exec wc -l {} + | sort -rn | head -20
-
-duplicates:
-    pnpm dlx jscpd src/
-
-slowtests:
-    pnpm vitest run --reporter=verbose tests | grep -E "duration" | sort -rn | head -50
-```
-
-### Java
-
-```just
-test-watch:
-    mvn -q fizzed-watcher:run -Dwatcher.touchFile=src/main/java
-
-integration-test:
-    mvn -q failsafe:integration-test
-
-complexity:
-    mvn -q spotbugs:check -Dspotbugs.includeFilterFile=spotbugs-complexity.xml
-
-loc:
-    @find src/main/java -name "*.java" -exec wc -l {} + | sort -rn | head -20
-
-duplicates:
-    mvn -q org.codehaus.mojo:cpd-maven-plugin:cpd
-
-slowtests:
-    mvn -q test -Dsurefire.printSummary=true | grep -E "ran in" | sort -rn | head -50
-```
+Adding a stack = add one file in `tier-1-quality/`; do not edit this concept file.
 
 ## Rules
 
