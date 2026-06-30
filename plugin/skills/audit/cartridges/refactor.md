@@ -11,8 +11,8 @@ Invoked by `/audit`. Findings can convert directly to a plan via `audit --plan`.
 ## Inputs
 
 - `.ffflow/config.yaml` for thresholds (or defaults).
-- Source + test trees.
-- Stack skill for tool commands.
+- Source + test trees. **In a polyglot monorepo these are per-subproject** — see "Scope" below; do not assume a single `src/`.
+- Stack skill for tool commands (the `dimensions:` block is canonical; this cartridge defers to it rather than hardcoding per-language invocations).
 
 ## Outputs
 
@@ -35,15 +35,23 @@ audit_refactor:
   test_suite_max_seconds: 30
 ```
 
-## Flow
+`complexity_limit` is cyclomatic. Rust's clippy uses **cognitive** complexity (a different metric; the Rust stack cartridge defaults it to 25, tunable in `clippy.toml`). Don't apply the cyclomatic `10` to Rust findings — read the threshold from the active stack's `dimensions:` block.
+
+## Scope (single-tree vs polyglot)
+
+Determine the scan scope before running any step.
+
+- **Single-tree project** — one stack, one source root. Scan it directly.
+- **Polyglot monorepo** — multiple subprojects, each with its own stack (e.g. `provable-ts/`, `provablecode-py/`, a Rust crate). There is no top-level `src/`. Run every step **per subproject**, resolving each subproject's stack from its own stack cartridge / justfile, then aggregate findings with their subproject path. Never scan the repo root as if it were one tree — `jscpd src/` against a polyglot root finds nothing or the wrong thing.
+- **Explicit target** — when `/refactor <path>` (or `/audit --type refactor <path>`) names a path, scan only that subtree and use the stack that owns it. This is the recommended invocation for large polyglot repos: scope to one subproject's hotspot, get one reviewable PR.
+
+If no target is given and the repo is polyglot, enumerate subprojects (the polyglot stack cartridge's subproject list) and iterate; do not silently scan only the root.
 
 ### 1. Complexity
 
-Run the stack's complexity tool:
+Run the stack's complexity tool. **Do not hardcode the per-language command here** — the stack skill's `dimensions:` block is the canonical record of which tool each stack uses (the same tool the justfile `complexity` recipe wraps; see `justfile/cartridges/tier-1-quality/<stack>.md`). Read the active stack's cartridge for the invocation. Across stacks today that resolves to: ruff `C90` (Python), eslint `complexity` (TypeScript), SpotBugs (Java), clippy `cognitive_complexity` (Rust). New stacks work automatically — when a stack cartridge defines the tool, this scan picks it up with no edit here.
 
-- Python: `ruff check --select C90 --config "lint.mccabe.max-complexity=10"`.
-- TypeScript: `eslint . --rule 'complexity: [error, 10]'`.
-- Java: SpotBugs cyclomatic complexity rule.
+The audit reports at `error` severity (every function over `complexity_limit` is a finding), independent of whether the justfile recipe runs the same tool at `warn` for its informational report.
 
 Each function above the limit is a finding (severity = low if just over, medium if 2× over, high if 3× over).
 
@@ -55,10 +63,9 @@ Files above `file_loc_block`: high.
 
 ### 3. Duplication
 
-Run a duplication detector:
+Run the stack's duplication detector — the same one the justfile `duplicates` recipe wraps (`justfile/cartridges/tier-1-quality/<stack>.md`); don't restate the command per language here. Across stacks today: jscpd (TypeScript), pylint `R0801` or jscpd (Python), CPD (Java).
 
-- Python: `pylint --disable=all --enable=R0801` or `jscpd --languages python`.
-- TypeScript: `jscpd src/`.
+**Rust has no first-class duplication tool** (no mature CPD/jscpd equivalent). For Rust, this scan produces no findings of its own; lean on clippy's copy-paste lints plus the LoC (step 2) and hot-spot (step 4) signals, and flag candidate clusters for manual review. Do not substitute a weak token-scanner — a misleading duplication signal is worse than an acknowledged gap.
 
 Any duplicate cluster above `duplication_threshold` is a finding. Cite both/all instances.
 
@@ -76,7 +83,7 @@ The idea: a complex file nobody touches is fine; a complex file everyone keeps t
 From the former `test-optimization`:
 
 **Speed analysis:**
-- Per-test duration (`pytest --durations=0` / `vitest --reporter=verbose`).
+- Per-test duration via the stack's profiling run (the justfile `slowtests` recipe wraps it per stack — pytest `--durations`, vitest reporter, surefire, cargo-nextest). Don't hardcode one runner.
 - Unit tests over `test_unit_max_ms` → finding (low).
 - Spec tests over `test_spec_max_ms` → finding (low).
 - Total suite over `test_suite_max_seconds` → finding (medium).
@@ -141,6 +148,8 @@ src/auth/signup.py contains 3 functions over complexity limit 10:
 - Never remove tests as part of a finding — only **suggest**. The user decides.
 - Never apply complexity refactors automatically. The fix is structural; auto-application produces bad code.
 - Re-run after any user-applied fix to confirm the finding is resolved.
+- **Report skipped scans; never imply full coverage.** If a scan can't run for the active stack (e.g. duplication on Rust), say so explicitly in the output — "duplication: not run (no first-class Rust tool)" — rather than emitting nothing and reading as "clean." A skipped scan and a clean scan must not look the same.
+- **State the scope scanned.** In a polyglot repo, list which subprojects were scanned and which were skipped, so partial runs are visible.
 
 ## Anti-patterns
 
