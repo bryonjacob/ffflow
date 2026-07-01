@@ -23,7 +23,7 @@ Produces a refactor plan via `audit --plan` (when invoked through the refactor c
 
 ## Outputs
 
-- A refactor plan in `plan/refactor-<slug>/`, ready for breakdown and capture.
+- A refactor plan in the canonical transient plan dir — `/tmp/ffflow-plans/<project-hash>/refactor-<slug>/` (project-hash from `sha256(pwd) | head -c 16`, same convention as `plan-chat`/`plan-status`). **Never write plan artifacts into the repo** (no `./plan/`); the plan dir is transient and `plan-status`/`plan-breakdown` locate it by the pwd-hash. Ready for breakdown and capture.
 - Or, when used inline during `work-issue`, a list of small in-PR refactors with their justifications.
 
 ## Principles
@@ -83,13 +83,23 @@ None. Pure refactor; no spec change.
 
 Refactor tasks always include the **no spec change** flag — they don't trigger spec audits. If a refactor would change observable behavior, it's not a refactor; it's a feature, and goes through `plan-chat`.
 
+**Refactor tasks at L2/L3 have no spec/RID delta — this is expected, not a gap.** A pure refactor adds no new `.feature` Rule, scenario, or RID because behavior doesn't change. The **existing** RID scenarios are the guardrail: they must pass **unmodified** through the refactor. So when `plan-capture`/`work-*` see a refactor task with an empty "Behavioral scope," that is correct — do not treat the absent spec delta as missing coverage, and do not invent a RID to fill it. The task's acceptance is "existing RIDs still green, complexity/LoC target met," not "new RID added." (See `quality-gates` on spec liveness — a refactor keeps specs live without adding to them.)
+
 ### 4. Hand off to `plan-breakdown`
 
-The generated `plan/refactor-<slug>/` flows through the normal pipeline:
+The generated `/tmp/ffflow-plans/<project-hash>/refactor-<slug>/` flows through the normal pipeline:
 
 ```
-/plan-breakdown → /plan-capture → /work-issue <issue>
+/plan-breakdown → /plan-capture → work
 ```
+
+**Choosing the execution step:**
+
+- **Multi-task epic** (the usual refactor case — several targets, one per file) → **`/work-epic`**: one feature branch, one squashed commit per task, one PR for the whole epic, you approve the merge. This is the right default for a refactor plan with more than one task.
+- **Single task** → `/work-issue <issue>`.
+- **Independent tasks you want in parallel worktrees** → `/work-fanout`.
+
+Do not default to one-branch-per-task; a refactor epic ships as a unit.
 
 ## Common refactor patterns
 

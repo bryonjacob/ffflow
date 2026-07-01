@@ -36,10 +36,18 @@ None directly. Level-aware reference to methodology skills only.
 
 **Refuses to run if:**
 
-1. `<plan-dir>/decisions.md` has any open `?` markers — tells the user to resume `plan-chat` to resolve them (`plan-chat` doesn't seal until they're all answered).
+1. `<plan-dir>/decisions.md` has any **open** `?` markers — tells the user to resume `plan-chat` to resolve them (`plan-chat` doesn't seal until they're all answered).
 2. `<plan-dir>/metadata.json` shows `phase: chat-incomplete` — tells the user to finish `plan-chat` first.
 
 These are non-negotiable. Plans get decomposed only after they're sealed.
+
+**What counts as an open marker (avoid false positives).** An *open* marker is a line that starts with `?` or a heading that starts with `## ?`, or any item under a `## Open decisions (?)` section — per the decision-marker convention in `CLAUDE.md`. It is **not** any occurrence of `?` anywhere in the file. Resolved decisions and prose questions do not count:
+
+- A resolved decision must not retain `?` in its heading. Rewrite `## ? D1 — …` to `## D1 — … (resolved)` once answered; don't leave the marker as archival decoration, or this gate trips on history.
+- Do not append a "for the record / original options" block that preserves the old `## ?` headings verbatim — strip or de-mark them. The resolution text at the top is the record.
+- A `?` inside a sentence (e.g. "should we cache here?") is prose, not a marker. Only line-leading `?` / `## ?` / the Open-decisions section gate the run.
+
+When the gate trips, report *which* lines matched so the user can see whether they're genuinely open or stale markers to clean up.
 
 ## Flow
 

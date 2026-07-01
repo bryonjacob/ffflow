@@ -77,7 +77,7 @@ The plugin is large. Built in phases — see [`docs/architecture.md`](docs/archi
 When authoring or editing skills, enforce these. Full text in `docs/architecture.md` §7.
 
 - **Plan Mode discipline.** Skills that interact about future actions must NOT invoke `EnterPlanMode`. State this explicitly at the top of the skill body. Required for: `plan-chat`, `plan-breakdown`, `characterize`, `work-issue`, `work-fanout`.
-- **Decision-marker convention.** Open decisions in plans/specs are marked with `?` at the start of the line, or in a `## Open decisions (?)` section.
+- **Decision-marker convention.** Open decisions in plans/specs are marked with `?` at the start of the line, or in a `## Open decisions (?)` section. Resolving a decision **removes** the marker (rewrite `## ? D1` → `## D1 (resolved)`); don't leave archival `## ?` headings — the `plan-breakdown` gate keys on open markers and stale ones trip it. Full rule: `docs/architecture.md` §7.2.
 - **PR-checkpoint protocol.** `work-issue`/`work-fanout` post a one-line summary after every PR; pause for confirmation after every 2 PRs in an unattended session.
 - **Local-validation gate.** `work-issue` does not push a non-spec-only PR without either a local repro/smoke pass, or an explicit statement in the PR body explaining why local validation wasn't possible.
 - **Idempotency.** Every state-writing skill detects existing state and updates rather than duplicating.

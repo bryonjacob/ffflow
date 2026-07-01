@@ -664,6 +664,8 @@ Skills that interact with the user about future actions explicitly state at the 
 
 In any plan or spec artifact, an open decision is marked with `?` at the start of the line or in a `## Open decisions (?)` section. `plan-chat` resolves them inline before sealing; `plan-breakdown` refuses to run if any remain.
 
+**Resolving a marker removes it.** When a decision is answered, rewrite its heading to drop the `?` — `## ? D1 — …` becomes `## D1 — … (resolved)`. Do not preserve the original `## ?` heading in an archival block; the resolution text is the record. The gate detects *open* markers only (line-leading `?`, `## ?` headings, the Open-decisions section) — not every `?` in the file, so prose questions are fine — but a stale `## ?` left as decoration will trip it. Skills that write `decisions.md` (`plan-chat`, `audit --plan`, `characterize`) own keeping resolved markers clean.
+
 ### 7.3 PR-checkpoint protocol
 
 `work-issue` and `work-fanout` follow the same protocol: after every PR, post a one-line summary. After every 2 PRs in an unattended session, pause and ask the user to confirm before continuing.
