@@ -63,7 +63,7 @@ The argument is the epic/umbrella issue number. For the GitHub backend:
 
 ```bash
 gh issue list --label "epic-<epic-id>" --state open --limit 100 --json number,title,labels
-gh issue view <epic-id> --json number,title,body   # epic title/body (reused in Step 4) + checklist (legacy fallback)
+gh issue view <epic-id> --json body   # epic checklist, used only for the legacy fallback below
 ```
 
 For other backends, equivalent queries via the active capture cartridge.
@@ -128,7 +128,7 @@ Push and open the PR:
 
 ```bash
 git push -u origin epic/<epic-id>
-gh pr create --base main --title "<epic issue title>" --body "$(cat <<'EOF'
+gh pr create --base main --title "Epic <epic-id> — <epic title>" --body "$(cat <<'EOF'
 ## Summary
 <one-paragraph epic summary>
 
@@ -142,14 +142,18 @@ EOF
 )"
 ```
 
-Reuse the epic issue's title and body from Step 1 (`gh issue view <epic-id>` already returned them — no search needed). `plan-capture` titles the epic `Epic: <plan title>`; use that verbatim as the PR title and its body as the basis for the PR Summary.
+Pull the epic's title and description from the umbrella issue. For GitHub:
+```bash
+gh issue list --search "Epic <epic-id>" --state all --json number,title,body --limit 5
+```
+Pick the one whose title starts with `Epic <epic-id> — …`. Use its title for the PR title and its body as the basis for the PR Summary.
 
 ### Step 5 — Holistic epic review (subagent)
 
 Spawn one more fresh subagent:
 
 - Review PR #<num> against the acceptance criteria for the epic **as a whole**.
-- Pull the epic AC from the epic issue resolved in Step 1.
+- Pull the epic AC from the umbrella issue resolved in Step 4.
 - Verify each task's AC is met **and** the tasks integrate cleanly.
 - Return `PASS` or specific fixes.
 
