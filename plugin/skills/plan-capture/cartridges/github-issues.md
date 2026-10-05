@@ -39,10 +39,17 @@ gh issue create \
 
 ```bash
 gh issue create \
-  --title "<task title>" \
+  --title "<ordinal-prefix><task title>" \
   --label "ffflow-task,epic-<epic-id>" \
   --body "<task body per protocol>"
 ```
+
+**Title ordinal prefix (required).** The execution order is burned into the title so `work-epic` sorts on it (its "Issue ordering" invariant) rather than on unreliable issue numbers. `<N>` is the task's 1-based position in the phase's dependency-ordered task list (`task-1` → `T1`):
+
+- **Roadmap plans** (one epic per phase): `E<phase-number> T<N> — `, e.g. `E3 T1 — Repository placement and synchronization`. The `E<phase-number>` matches the epic's own short code.
+- **Single-slice plans** (one epic, no phase): `T<N> — `, e.g. `T1 — Add password validator`.
+
+Use a plain ` — ` (space–em-dash–space) between the ordinal and the task title. Never create a task issue without the prefix.
 
 Task body ends with the standard `## Working notes` block from the protocol:
 ```markdown
@@ -64,10 +71,28 @@ Per phase, the cartridge creates a phase-epic issue holding the phase's tasks. P
 
 ### Update epic with real issue numbers
 
-After all task issues exist:
+After all task issues exist, patch the epic body's checklist with real issue numbers, **in ordinal order** — the title already carries the ordinal, so the line reads `- [ ] #<n> <full task title>`:
+
+```markdown
+## Tasks
+- [ ] #103 E3 T1 — Repository placement and synchronization
+- [ ] #104 E3 T2 — Paseo installation and change classification
+```
+
 ```bash
 gh issue edit <epic-id> --body "<patched body with real #s>"
 ```
+
+### Verify the ordinal prefix (guardrail)
+
+Before returning the map to `plan-capture`, re-read the titles of the issues just created/patched and confirm every task title matches `^(E\d+ )?T\d+ — `:
+
+```bash
+gh issue list --label "epic-<epic-id>" --state all --json number,title \
+  --jq '.[] | select(.title | test("^(E[0-9]+ )?T[0-9]+ — ") | not) | "MISSING ORDINAL: #\(.number) \(.title)"'
+```
+
+Any output means generation regressed — report the offending issues to `plan-capture` and stop; do not leave an epic with unordered titles.
 
 ### Set dependencies
 
