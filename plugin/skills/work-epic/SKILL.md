@@ -45,7 +45,7 @@ These are non-negotiable.
 
 GitHub issue numbers are out of order (parallel agents created them). The **titles** are ground truth — `plan-capture` burns the task ordinal into every title as `T<N> — <title>` (e.g. `T1 — Add validator`). Always sort by title, never by issue number. Use a natural sort on the `T<N>` prefix so `T10` comes after `T2`. Older titles may carry an epic code before the ordinal (for example, `E0.1 T1 — …`); the `T<N>` component remains the ordering key.
 
-**Legacy fallback.** Epics captured before the ordinal scheme have plain titles with no `T<N>`. If *none* of the resolved titles carry a `T<N>` prefix, don't guess — fall back to the epic issue's checklist order, and tell the user this epic predates the ordinal scheme (titles weren't burned in). Titles remain primary whenever they carry the ordinal.
+**Legacy fallback.** Epics captured before the ordinal scheme have plain titles with no `T<N>`; partially recaptured epics may contain a mix of prefixed and plain titles. If *any* resolved title lacks a `T<N>` ordinal, don't combine ordering schemes or guess — fall back to the epic issue's checklist order for the entire task set, and warn the user. Titles are primary only when every resolved task carries the ordinal.
 
 ### Implement and review never share a subagent
 
@@ -68,7 +68,7 @@ gh issue view <epic-id> --json body   # epic checklist, used only for the legacy
 
 For other backends, equivalent queries via the active capture cartridge.
 
-Parse the tasks, extract the `T<N>` from each title, sort numerically (natural sort — `T10` after `T2`). Per the **Issue ordering** invariant, if no title carries a `T<N>`, fall back to the epic's checklist order and warn. **Print the resolved task list** (issue # + title in execution order) to the user before doing anything destructive. If zero issues found, stop and ask.
+Parse the tasks. If every title carries a `T<N>` ordinal, extract it and sort numerically (natural sort — `T10` after `T2`). Per the **Issue ordering** invariant, if any title lacks a `T<N>`, fall back to the epic's checklist order for the entire task set and warn. **Print the resolved task list** (issue # + title in execution order) to the user before doing anything destructive. If zero issues found, stop and ask.
 
 ### Step 2 — Branch
 
