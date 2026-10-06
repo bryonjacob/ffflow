@@ -39,15 +39,12 @@ gh issue create \
 
 ```bash
 gh issue create \
-  --title "<ordinal-prefix><task title>" \
+  --title "T<N> — <task title>" \
   --label "ffflow-task,epic-<epic-id>" \
   --body "<task body per protocol>"
 ```
 
-**Title ordinal prefix (required).** The execution order is burned into the title so `work-epic` sorts on it (its "Issue ordering" invariant) rather than on unreliable issue numbers. `<N>` is the task's 1-based position in the phase's dependency-ordered task list (`task-1` → `T1`):
-
-- **Roadmap plans** (one epic per phase): `E<phase-number> T<N> — `, e.g. `E3 T1 — Repository placement and synchronization`. The `E<phase-number>` matches the epic's own short code.
-- **Single-slice plans** (one epic, no phase): `T<N> — `, e.g. `T1 — Add password validator`.
+**Title ordinal prefix (required).** The execution order is burned into the title so `work-epic` sorts on it (its "Issue ordering" invariant) rather than on unreliable issue numbers. For both roadmap and single-slice plans, use `T<N> — `, where `<N>` is the task's 1-based position in the phase's dependency-ordered task list (`task-1` → `T1`), e.g. `T1 — Add password validator`.
 
 Use a plain ` — ` (space–em-dash–space) between the ordinal and the task title. Never create a task issue without the prefix.
 
@@ -75,8 +72,8 @@ After all task issues exist, patch the epic body's checklist with real issue num
 
 ```markdown
 ## Tasks
-- [ ] #103 E3 T1 — Repository placement and synchronization
-- [ ] #104 E3 T2 — Paseo installation and change classification
+- [ ] #103 T1 — Repository placement and synchronization
+- [ ] #104 T2 — Paseo installation and change classification
 ```
 
 ```bash
@@ -85,11 +82,11 @@ gh issue edit <epic-id> --body "<patched body with real #s>"
 
 ### Verify the ordinal prefix (guardrail)
 
-Before returning the map to `plan-capture`, re-read the titles of the issues just created/patched and confirm every task title matches `^(E\d+ )?T\d+ — `:
+Before returning the map to `plan-capture`, re-read the titles of the issues just created/patched and confirm every task title matches `^T\d+ — `:
 
 ```bash
 gh issue list --label "epic-<epic-id>" --state all --json number,title \
-  --jq '.[] | select(.title | test("^(E[0-9]+ )?T[0-9]+ — ") | not) | "MISSING ORDINAL: #\(.number) \(.title)"'
+  --jq '.[] | select(.title | test("^T[0-9]+ — ") | not) | "MISSING ORDINAL: #\(.number) \(.title)"'
 ```
 
 Any output means generation regressed — report the offending issues to `plan-capture` and stop; do not leave an epic with unordered titles.

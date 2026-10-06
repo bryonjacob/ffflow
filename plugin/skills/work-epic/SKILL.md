@@ -43,7 +43,7 @@ These are non-negotiable.
 
 ### Issue ordering
 
-GitHub issue numbers are out of order (parallel agents created them). The **titles** are ground truth — `plan-capture` burns the task ordinal into every title: `E<phase> T<N> — <title>` for roadmap epics (e.g. `E3 T1 — Repository placement…`), `T<N> — <title>` for single-slice ones (e.g. `T1 — Add validator`). Always sort by title, never by issue number. Use a natural sort on the `T<N>` prefix so `T10` comes after `T2`.
+GitHub issue numbers are out of order (parallel agents created them). The **titles** are ground truth — `plan-capture` burns the task ordinal into every title as `T<N> — <title>` (e.g. `T1 — Add validator`). Always sort by title, never by issue number. Use a natural sort on the `T<N>` prefix so `T10` comes after `T2`. Older titles may carry an epic code before the ordinal (for example, `E0.1 T1 — …`); the `T<N>` component remains the ordering key.
 
 **Legacy fallback.** Epics captured before the ordinal scheme have plain titles with no `T<N>`. If *none* of the resolved titles carry a `T<N>` prefix, don't guess — fall back to the epic issue's checklist order, and tell the user this epic predates the ordinal scheme (titles weren't burned in). Titles remain primary whenever they carry the ordinal.
 
