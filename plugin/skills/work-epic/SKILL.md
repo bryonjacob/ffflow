@@ -59,7 +59,7 @@ This skill never merges. Even green PRs sit until the user approves. Step 7 (pos
 
 For GitHub backend:
 ```bash
-gh issue list --label "epic:<epic-id>" --state open --limit 100 --json number,title,labels
+gh issue list --label "epic-<epic-id>" --state open --limit 100 --json number,title,labels
 ```
 
 For other backends, equivalent query via the active capture cartridge.
