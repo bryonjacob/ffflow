@@ -85,7 +85,7 @@ gh issue edit <epic-id> --body "<patched body with real #s>"
 Before returning the map to `plan-capture`, re-read the titles of the issues just created/patched and confirm every task title matches `^T\d+ — `:
 
 ```bash
-gh issue list --label "epic-<epic-id>" --state all --json number,title \
+gh issue list --label "epic-<epic-id>" --state all --limit 500 --json number,title \
   --jq '.[] | select(.title | test("^T[0-9]+ — ") | not) | "MISSING ORDINAL: #\(.number) \(.title)"'
 ```
 
