@@ -183,7 +183,7 @@ Every cartridge implements the same contract. The protocol is defined here; each
 ### Inputs (passed from plan-capture's flow)
 
 - Path to `<plan-dir>`.
-- Ordered list of task file paths (per-phase for roadmap plans).
+- Ordered list of task file paths (per-phase for roadmap plans). Their order is the execution order; the task's 1-based position is its ordinal `N`.
 - Phase context (for roadmap plans): the phase's title, scope, success criteria.
 - Epic-level context from `plan.md` or the relevant phase placeholder.
 - `captured.json` if it exists (for resume/update).
@@ -202,7 +202,7 @@ Every cartridge implements the same contract. The protocol is defined here; each
    - **Roadmap back-link**: `Roadmap: docs/roadmap/<slug>/phases/phase-N.md` (for roadmap plans only; omit for single-slice).
    - Task list with placeholders (filled in step 5).
 
-3. **Create or update each task work item.** Body = the task file's contents verbatim, plus a `## Working notes` section with:
+3. **Create or update each task work item.** The work-item **title carries the execution ordinal** so `work-epic` can order on it: `T<N> — <title>` for both roadmap and single-slice plans. (Exact wire format per cartridge.) Body = the task file's contents verbatim, plus a `## Working notes` section with:
    - Branch name (`task/<plan-slug>/task-N-<short-title>`).
    - Epic/phase link.
    - Spec back-link.
@@ -218,6 +218,7 @@ Every cartridge implements the same contract. The protocol is defined here; each
 
 ### Hard rules
 
+- **Ordinal prefix is required.** Every task title carries its `T<N>` ordinal. After capture, verify each created/updated title matches `^T\d+ — ` and refuse — reporting the offenders — if any lack it. This is what makes titles ground truth for ordering; a missing prefix silently breaks `work-epic`.
 - **Spec back-link is required.** If any task file lacks a spec back-link, refuse to capture and tell `plan-capture` which task is broken. The breakdown didn't slice cleanly.
 - **Roadmap back-link is required when a roadmap exists.** Same shape: refuse if missing.
 - **No status transitions.** Backends don't move work items through workflow states. That's `/work-issue`-time or manual.

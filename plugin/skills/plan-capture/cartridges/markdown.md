@@ -56,7 +56,7 @@ Body per the protocol's epic shape, plus `**Status:** open` at top. For roadmap 
 ### Create each task file (`docs/tasks/<slug>/task-N.md`)
 
 ```markdown
-# Task <N>: <title>
+# T<N> — <title>
 
 **Status:** open
 **Epic:** [EPIC-phase-N](EPIC-phase-N.md)

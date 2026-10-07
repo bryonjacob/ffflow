@@ -52,7 +52,7 @@ Or via GraphQL `projectCreate`.
 linear issue create \
   --team <team-id> \
   --project <project-id> \
-  --title "<task title>" \
+  --title "T<N> — <task title>" \
   --description "<task body per protocol>" \
   --label ffflow-task
 ```

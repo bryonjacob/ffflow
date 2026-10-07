@@ -47,7 +47,7 @@ Or via REST `POST /rest/api/3/issue`.
 ### Create each task (Story by default)
 
 ```bash
-jira issue create --type Story --summary "<task title>" --description "<body per protocol>" \
+jira issue create --type Story --summary "T<N> — <task title>" --description "<body per protocol>" \
   --custom "<epic_link_field>=<epic-key>"
 ```
 
