@@ -8,7 +8,7 @@ The format is loosely [Keep a Changelog](https://keepachangelog.com/); versionin
 
 ---
 
-## [0.4.2] — 2026-10-05
+## [0.4.2] — 2026-10-07
 
 ### Fixed
 - **`work-epic` now queries the task label format emitted by `plan-capture`.** Task discovery uses `epic-<epic-id>` instead of the mismatched `epic:<epic-id>`, so captured tasks are found correctly.
