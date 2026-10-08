@@ -30,7 +30,7 @@ They track the same thing because there's one plugin in this marketplace. Keepin
 
 - **patch** (`0.2.0 → 0.2.1`) — additive or backward-compatible: new recipes/cartridges, restructured-but-equivalent content, doc fixes, new stack/language support.
 - **minor** (`0.2.x → 0.3.0`) — new skills, new user-facing capability, or a meaningful workflow addition.
-- **major** (`0.x → 1.0`) — removing/renaming a skill or changing a documented interface (recipe names, `--type` values, config schema) in a breaking way.
+- **major** (`0.x → 1.0`) — removing/renaming a skill or changing a documented interface (recipe names, `--type` values, config schema, anything in [`plugin/docs/integration-surface.md`](plugin/docs/integration-surface.md)) in a breaking way.
 
 **Why bump at all?** Claude Code picks up the latest commit on plugin update regardless of the number — the version is the *human* signal that something changed (and what the update UI compares). A static version across a real change is a footgun; always bump.
 

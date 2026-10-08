@@ -58,7 +58,8 @@ ffflow-plugin/                         # repo root (also the marketplace)
     │   ├── architecture.md            # Build spec (authoritative)
     │   ├── levels.md                  # The L0–L3 dial explained
     │   ├── workflows.md               # Lifecycle flows
-    │   └── audit.md                   # Audit subsystem
+    │   ├── audit.md                   # Audit subsystem
+    │   └── integration-surface.md     # What external tools may rely on (semver-protected)
     └── skills/
         └── <skills>                   # See docs/architecture.md §5 for the full catalog
 ```
