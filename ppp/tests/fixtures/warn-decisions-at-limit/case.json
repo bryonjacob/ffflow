@@ -1,0 +1,13 @@
+{
+  "target": ".",
+  "args": [],
+  "exit": 0,
+  "fails": [],
+  "warns": [
+    "DECISIONS-AT-LIMIT"
+  ],
+  "fail_counts": {},
+  "metrics": {
+    "key_decisions": 3
+  }
+}

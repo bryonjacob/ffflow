@@ -1,0 +1,12 @@
+{
+  "target": ".",
+  "args": [
+    "--ratify"
+  ],
+  "exit": 1,
+  "fails": [
+    "PROVISIONAL"
+  ],
+  "warns": [],
+  "fail_counts": {}
+}

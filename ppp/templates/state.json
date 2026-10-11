@@ -1,0 +1,10 @@
+{
+  "slug": "<slug>",
+  "round": 1,
+  "round_cap": 3,
+  "opening": "builder",
+  "next": "builder",
+  "status": "drafting",
+  "signoff": { "builder": null, "product": null },
+  "links": { "parent": null, "children": [] }
+}

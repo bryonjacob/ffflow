@@ -1,0 +1,13 @@
+{
+  "target": ".",
+  "args": [
+    "--prev",
+    "prev.md",
+    "--memo",
+    "memo.md"
+  ],
+  "exit": 0,
+  "fails": [],
+  "warns": [],
+  "fail_counts": {}
+}

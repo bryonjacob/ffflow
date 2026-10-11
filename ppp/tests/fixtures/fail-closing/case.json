@@ -1,0 +1,12 @@
+{
+  "target": "../pass-good",
+  "args": [
+    "--closing"
+  ],
+  "exit": 1,
+  "fails": [
+    "CLOSING"
+  ],
+  "warns": [],
+  "fail_counts": {}
+}

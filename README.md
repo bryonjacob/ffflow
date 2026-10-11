@@ -1,4 +1,18 @@
-# FFFlow Plugin for Claude Code
+# FFFlow marketplace for Claude Code
+
+Two independent plugins: **fff** — plan, work, audit, at the level of rigor your project actually needs; **ppp** — product ping-pong: builder and product negotiate a PRD to convergence. Install either or both.
+
+## Install
+
+```bash
+/plugin marketplace add /path/to/ffflow-plugin
+/plugin install fff@ffflow
+/plugin install ppp@ffflow
+```
+
+Commands are namespaced per plugin: `/fff:…` (e.g., `/fff:plan-chat`, `/fff:work-issue`) and `/ppp:…` (e.g., `/ppp:prd-start`, `/ppp:prd-turn`).
+
+## fff — FFFlow
 
 **Plan, work, audit — at the level of rigor your project actually needs.**
 
@@ -6,16 +20,7 @@ FFFlow is a complete development lifecycle in a single Claude Code plugin. It sc
 
 The plugin's invocation prefix is `/fff:` — short, distinctive, won't collide.
 
-## Install
-
-```bash
-/plugin marketplace add /path/to/ffflow-plugin
-/plugin install fff@ffflow
-```
-
-After install, every command is namespaced under `/fff:` (e.g., `/fff:plan-chat`, `/fff:work-issue`).
-
-## The shape
+### The shape
 
 Three artifacts. Three roles. Three locations.
 
@@ -23,7 +28,7 @@ Three artifacts. Three roles. Three locations.
 - **Plan** (future tense, transient) — the path from current spec to next spec. Lives in `/tmp/ffflow-plans/<project-hash>/<slug>/`, never in the project tree.
 - **Issues** (imperative, transactional) — the chess moves. Lives in your issue tracker.
 
-## Workflows
+### Workflows
 
 **Bootstrap a new project (from `project.md`, README, or just an idea):**
 ```
@@ -54,7 +59,7 @@ Three artifacts. Three roles. Three locations.
 
 Updating the plugin changes what FFFlow *believes*; it doesn't change what your repo *contains*. `/fff:upgrade-ffflow` closes that gap — it reads the `ffflow_version` stamped in `.ffflow/config.yaml`, walks the migration ledger, and applies whatever your project is missing. Projects adopted before 0.4.0 have no stamp; the skill infers their effective version from what's actually in the tree, then stamps it so it never has to guess again.
 
-## Two-tier planning
+### Two-tier planning
 
 - **Tier 1** — `/fff:plan-roadmap` (phase-level). Used for new projects, big features, or new directions.
 - **Tier 2** — three entries, each handling one phase:
@@ -66,7 +71,7 @@ All four converge on `plan-breakdown → plan-capture → work-*`.
 
 Single-slice changes skip tier 1; bug fixes go through `plan-chat` directly.
 
-## The L0–L3 dial
+### The L0–L3 dial
 
 Pick the level your project needs. You can change levels later.
 
@@ -79,7 +84,7 @@ Pick the level your project needs. You can change levels later.
 
 No config = L0. Declare your level in `.ffflow/config.yaml` to enable more.
 
-## Cartridge architecture
+### Cartridge architecture
 
 Several skills carry their family of variants as on-demand cartridges, keeping the LLM's skill index uncluttered:
 
@@ -90,12 +95,30 @@ Several skills carry their family of variants as on-demand cartridges, keeping t
 
 Configure once in `.ffflow/config.yaml`; the right cartridge loads when needed.
 
-## What FFFlow doesn't do
+### What FFFlow doesn't do
 
 - It doesn't lock you to one stack. Pluggable via cartridges; override any tool via `.ffflow/stack.yaml`.
 - It doesn't lock you to GitHub. Capture backends are pluggable (Linear, Jira, markdown).
 - It doesn't replace your tests. Spec tests are additive — both unit and spec tests have independent coverage thresholds.
 - It doesn't force L3 on you. L0 is a valid forever-state for projects that want lightweight discipline.
+
+## ppp — product ping-pong
+
+A builder seat and a product seat take turns revising one PRD, and every turn must pass a mechanical check (no names, no estimates, no history, no bloat) before it lands. What doesn't belong goes to a parking lot, an analyst seat answers data requests neutrally, and each round ends with a retro on the record. The PRD converges when no question is open, and is ratified when every seat signs off with nothing provisional left.
+
+```
+/ppp:prd-start [<medium>]               Agree the medium, seat the parties, create the bundle.
+/ppp:prd-turn --seat builder|product    Take one turn: respond, revise, park, ask, memo, check.
+/ppp:prd-data                           Analyst seat: answer open data requests with evidence.
+/ppp:prd-retro                          Close the round: retro, tidy the lot, summary; converge, ratify.
+/ppp:prd-check                          The mechanical rules (also run inside every turn).
+/ppp:prd-split                          Carve a growing thread into its own PRD.
+/ppp:prd-status                         Where one PRD, or the whole portfolio, stands.
+```
+
+**Any medium.** A PRD bundle is a handful of text documents; they can live anywhere that meets the requirements in [`ppp/media.md`](ppp/media.md) — every seat can read and write them, a version is kept per turn, and the seats agree how hand-off, sign-off and the final commit work. The repo + draft-PR worked example is offered by default; bring your own by pointing `/ppp:prd-start` at a medium document. The agreement is recorded in each bundle's `medium.md`.
+
+PPP doesn't depend on fff; a converged PRD can feed any planning step, including `/fff:plan-roadmap`.
 
 ## Documentation
 
@@ -104,7 +127,12 @@ Configure once in `.ffflow/config.yaml`; the right cartridge loads when needed.
 - [Workflows](plugin/docs/workflows.md) — the lifecycle flows
 - [Audit subsystem](plugin/docs/audit.md) — the keep-honest layer
 - [Migration ledger](plugin/docs/migrations.md) — what `/fff:upgrade-ffflow` reads
-- [Changelog](CHANGELOG.md) — release history
+- [Changelog](CHANGELOG.md) — fff release history and catalog notes
+- [PPP design](ppp/CLAUDE.md) — what the ppp plugin is and its invariants
+- [PPP process](ppp/process.md) — the process contract every `/ppp:` skill implements
+- [PPP media](ppp/media.md) — where a bundle can live; the worked example
+- [PPP design PRD](ppp/docs/prds/ppp/ppp-prd.md) — PPP's own PRD, as a PPP bundle
+- [PPP changelog](ppp/CHANGELOG.md) — ppp release history
 
 ## Status
 
