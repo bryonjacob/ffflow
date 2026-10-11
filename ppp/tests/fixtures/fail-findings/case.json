@@ -1,0 +1,17 @@
+{
+  "target": ".",
+  "args": [
+    "--memo",
+    "memo.md",
+    "--summary",
+    "summary.md",
+    "--seat",
+    "builder"
+  ],
+  "exit": 1,
+  "fails": [
+    "FINDINGS"
+  ],
+  "warns": [],
+  "fail_counts": {}
+}

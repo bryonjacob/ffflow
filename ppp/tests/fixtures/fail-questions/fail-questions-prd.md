@@ -39,7 +39,7 @@ owner ([E-01](evidence/01-requests.md)).
 
 ## 8. Increments
 1. **Shared queue (XL):** one queue for every request; unlocks pickup by any owner.
-2. **Status page (XL):** clients see status; unlocks fewer chase emails.
+2. **Status page (L):** clients see status; unlocks fewer chase emails.
 3. **Escalation (M):** breach routing.
 
 ## 9. Risks
@@ -54,7 +54,7 @@ owner ([E-01](evidence/01-requests.md)).
 |---|---|---|---|---|---|---|
 | Q-1 | ? | Six columns only | builder | product | open |
 | Q-2 | | Bad status | builder | product | pending | x |
-| Q-3 | ? | Marker on an answered question | builder | product | answered | Yes |
+| Q-3 | ? | Marker on an answered question | builder | product | answered | → R-1 |
 | Q-4 | | Deferred without an owner | builder | | deferred | when volume doubles |
 | Q-5 | | Dropped without a resolution | builder | product | dropped | |
 | Q-6 | ? | | builder | product | open | |

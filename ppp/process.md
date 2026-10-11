@@ -14,7 +14,7 @@ they work.
 | **builder** | feasibility, shape of the solution, relative sizes, risks | set product commitments or service levels |
 | **product** | outcomes, client experience, commitments, service levels, priorities | dictate implementation |
 | **analyst** | answering data requests with evidence, neutrally | argue a position |
-| **facilitator** | turn order, checks, retros, convergence (this is the plugin itself) | change PRD content |
+| **facilitator** | turn order, checks, retros, findings, status (this is the plugin itself) | change PRD content: what it notices goes in round summaries as findings |
 
 **Everyone sees everything.** Every file in the bundle is readable by every seat at every turn.
 No private channels. `medium.md` may name the people who hold seats and how to reach them; the PRD
@@ -28,6 +28,7 @@ and parking lot never name people.
     roles.md               role glossary: every role a PRD may name
     glossary.md            domain terms
     roster.txt             names of real people in the inputs (used only by prd-check)
+    facts.md               the one canonical fact sheet; the analyst keeps it (§Data requests)
     inputs/                source material: requests, KR docs, research
     limits.json            optional; overrides the defaults in the service parameters
   <slug>/
@@ -36,7 +37,7 @@ and parking lot never name people.
     evidence/              requests.md is the queue; <nn>-<topic>.md are the answers
     rounds/<n>-summary.md  the retro for round n
     turns/<n>-<seat>.md    turn memos
-    state.json             round, next seat, status, sign-offs, split links
+    state.json             round, round cap, next seat, status, sign-offs, split links
     medium.md              the agreed medium: where each part lives, how versions,
                            hand-off, sign-off and the commit work
 ```
@@ -93,14 +94,21 @@ Rules:
    calculation (start, pause, stop, business-day and holiday rules) · default and whether it is
    configurable per client or by policy without a code change · how it is measured · what happens
    at risk and at breach. Time units are allowed here and in metric windows, nowhere else.
-5. **Data is cited, not pasted.** Key numbers appear with a link to an `evidence/` file.
+5. **Data is cited, not pasted.** Key numbers appear with a link to an `evidence/` file or to
+   `_shared/facts.md`.
 6. **Key decisions: 0 to 3.** Only high-impact choices likely to be relitigated. The best PRDs need
    none because the requirements already say it.
 7. **Provisional values are tagged.** Any seat writing a value no one has evidence or authority for
    writes it `[provisional]` or `[provisional: <reason>]`; both forms count, and a reason is
    encouraged. A PRD can converge with provisional values; it cannot be ratified with them.
+   Clearing one needs a reason: the memo's **Provisional cleared** lines name each value and the
+   evidence file, or the role from `_shared/roles.md` whose authority settles it.
 8. **Soft ceiling about 2,500 words.** Any turn that grows the PRD must justify the growth in its
-   memo as net-new information the final PRD needs.
+   memo as net-new information the final PRD needs. This holds in every round.
+9. **Questions keep their rows.** Answered, deferred and dropped rows stay in the table, and a `Q-n`
+   is never reused. Each fact lives once: an answered question's Resolution only points to where
+   the answer lives (`→ R-15`, `→ §6 Turnaround`), in at most 15 words. Deferred: an owner role and
+   a trigger, never a date. Dropped: the reason.
 
 ## The parking lot
 
@@ -120,44 +128,62 @@ entry stays one line (about 30 words).
 
 ## A turn
 
+**Handing over is a conditional yes.** Every turn that passes the PRD on means: "I'd sign this
+exactly as it stands, if you will."
+
 1. Get the current bundle as `medium.md` says and read all of it.
 2. Respond to the other seat's last turn: accept, push back with evidence, offer one alternative.
+   Answer, by ID, every facilitator finding addressed to your seat (§Retro).
 3. Edit the PRD in place. Close what you can; add questions with the next free ID.
 4. Park anything that doesn't belong.
 5. Optionally file data requests in `evidence/requests.md`.
-6. Write the memo (≤ 500 words): accepted · pushed back · parked · data asked · growth
-   justification · **Cut** (the biggest thing removed this turn, and what you would cut next to
-   reach about 80% of the ceiling) · **Key decisions kept** (for each, why a requirement can't
-   carry it). Limits are ceilings, not targets.
+6. Write the memo (`templates/memo.md`, ≤ 500 words). Limits are ceilings, not targets.
 7. Run `prd-check` (on a local copy if the medium isn't local). The turn lands only when it passes.
-8. Write back and hand off as `medium.md` says.
+8. Write back and hand off as `medium.md` says. A turn never changes `status` in `state.json`;
+   only `prd-retro` sets it.
+
+**Agreement is a no-edit turn.** A seat that would sign the PRD as it stands takes a turn that
+leaves it byte-identical to what it received (only trailing whitespace and line endings may
+differ); its memo says `agreed`. The parking lot, evidence requests and the memo may still change.
+Any change to the PRD is a normal turn, and the ball goes back.
 
 ## Data requests
 
 Either seat may ask. The analyst answers before the next turn into `evidence/<nn>-<topic>.md`:
 question · method · result · as-of date · caveats. The analyst answers the question asked and
-offers no opinion. Evidence is the main thing that moves positions; ask early.
+offers no opinion. Evidence is the main thing that moves positions; ask early. Requests may be
+answered while the retro runs.
+
+`_shared/facts.md` (`templates/facts.md`) is the portfolio's one fact sheet. When sources disagree,
+the analyst records there, through `prd-data`, which source wins and why. PRDs cite `facts.md` or
+evidence files, never a raw input that `facts.md` overrides.
 
 ## Rounds and convergence
 
-A round is one turn per side, then a retro. Default cap: 3 rounds.
+A round is one turn per side, then a retro.
 
-- **Round 1:** the opening seat drafts (usually builder, from inputs); the other responds.
-- **Round 2:** narrow. No new fronts unless critical.
-- **Round 3 (closing):** builder proposes a resolution for every open question; product closes
-  every one: `answered`, `deferred` (owner role and a trigger, never a date), or `dropped` (reason).
-  Each seat records sign-off (`yes`, `yes-with-conditions` or `no`) in its closing memo, in
-  `state.json`, and in the medium as `medium.md` says. A condition must exist in the PRD as a
-  requirement or a deferred question.
-- **Round 4** only to close a real blocker. Never a fifth.
+- **Round 1: data before rulings.** The opening seat drafts (usually builder, from inputs); the
+  other responds. Each round-1 memo lists the data requests it filed, or says `none needed` and why.
+- **Later rounds:** narrow. No new fronts unless critical.
+- **Round cap** (`round_cap` in `state.json`, default 3) is an escalation trigger, not a closing
+  rule: at the cap, the portfolio lead decides to split, park, or allow another round.
 
-States: `drafting` → `converged` (zero open questions, check clean) → `ratified` (converged, every
-seat signed off `yes` or `yes-with-conditions`, no `[provisional]` left). Ratification is completed
-by the medium's commit act (worked example: merge).
+States, set only by `prd-retro`:
+- `drafting`.
+- `converged`: the latest turn is an agreement turn, zero questions are open, the check passes,
+  and no facilitator finding is unanswered.
+- `ratified`: converged, no `[provisional]` value in either form, and the medium's commit act done
+  (worked example: PR marked ready for review, every seat approves the unchanged PRD, then merge).
+
+**Sign-off is `yes` or `no`**, given through the medium's sign-off act once converged and recorded
+in `state.json`. There are no conditions: a condition is a change, so it is made in another turn,
+the ball goes back, and the PRD is drafting again. Status lives in `state.json` only; the PRD has
+no status line, because the facilitator never edits the PRD.
 
 ## Retro (end of every round, on the record)
 
-Each seat answers, in ≤ 150 words:
+Each seat answers, in ≤ 150 words per answer (words of the answer only; headings and question
+labels don't count):
 1. What changed your mind this round, and on what evidence?
 2. What worries you most in the PRD as it stands?
 3. What would you give up to close faster?
@@ -166,15 +192,26 @@ Each seat answers, in ≤ 150 words:
 
 The facilitator tidies the parking lot (merges duplicates, marks routed `other-prd` and `split`
 entries with where they went), then writes `rounds/<n>-summary.md` (≤ 300 words): what moved ·
-still contested · parked · data gathered · sign-off posture · what the next round must do. Every
-seat reads it next.
+still contested · parked · data gathered · convergence posture · what the next round must do ·
+facilitator findings. Every seat reads it next.
+
+**Facilitator findings.** What the retro surfaces (an unwritten assumption, a question, a gap) the
+facilitator writes as a finding in the round summary, never in the PRD: `F-n` numbered across the
+whole bundle and never reused, an owner seat, and the text. The owning seat's next memo answers
+each by ID: `accepted` (and where the PRD now covers it) or `rejected` (with a reason). A finding
+raised after the agreement turn that matters is a named blocker: the portfolio lead decides on
+another round, as at the cap. Otherwise it is parked.
 
 ## Split signals
 
 `prd-check` recommends a split when any of these hold after a trim pass: over the ceiling ·
 more than 3 key decisions · more than 2 XL increments · size debates in two consecutive memos ·
-journeys for distinct primary users who never interact. The facilitator proposes the split; the
-seats accept or reject it in their next memo.
+journeys for distinct primary users who never interact.
+
+A split is proposed in an ordinary turn: a `split` entry in the parking lot and the memo line
+`Split P-n: accept`. The other seat answers in its next memo, `Split P-n: accept` or
+`Split P-n: reject`. Both seats' acceptances are `prd-split`'s confirmation; there is no special
+split mode. The facilitator may suggest a split only as a finding.
 
 ## Evidence rule (every seat)
 

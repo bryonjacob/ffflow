@@ -33,4 +33,4 @@ Agreed by every seat when this PRD started. Every PPP skill reads this first and
 <how the next seat learns it is their turn>
 
 ## Converged, sign-off and commit
-<the act that marks converged; how each seat signs off; the act that commits the ratified version>
+<the act that marks converged; how each seat signs off `yes` or `no` on the unchanged PRD; the act that commits the ratified version>

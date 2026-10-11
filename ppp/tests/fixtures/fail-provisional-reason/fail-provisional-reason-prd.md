@@ -39,7 +39,7 @@ owner ([E-01](evidence/01-requests.md)).
 
 ## 8. Increments
 1. **Shared queue (XL):** one queue for every request; unlocks pickup by any owner.
-2. **Status page (XL):** clients see status; unlocks fewer chase emails.
+2. **Status page (L):** clients see status; unlocks fewer chase emails.
 3. **Escalation (M):** breach routing.
 
 ## 9. Risks
@@ -52,7 +52,7 @@ owner ([E-01](evidence/01-requests.md)).
 ## 11. Open questions
 | ID | ? | Question | Raised by | Owner (role) | Status | Resolution |
 |---|---|---|---|---|---|---|
-| Q-1 | | Which channel do clients use to raise requests? | builder | product | answered | The client portal |
-| Q-2 | | Is the window set per client? | product | product | answered | Yes, configurable per client |
+| Q-1 | | Which channel do clients use to raise requests? | builder | product | answered | → §4 Client journey |
+| Q-2 | | Is the window set per client? | product | product | answered | → §6 Acknowledgement window |
 | Q-3 | | Should requests close on their own? | builder | account owner | deferred | Revisit when the unowned share meets its target |
 | Q-4 | | Should owners rotate? | product | product | dropped | Any owner can pick up any request |

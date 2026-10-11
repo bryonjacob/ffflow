@@ -1,0 +1,11 @@
+{
+  "target": ".",
+  "args": [
+    "--prev",
+    "prev.md"
+  ],
+  "exit": 2,
+  "fails": [],
+  "warns": [],
+  "fail_counts": {}
+}

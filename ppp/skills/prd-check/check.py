@@ -1,7 +1,7 @@
 """prd-check: the mechanical rules of the PPP process.
 
-usage: python3 check.py <bundle-dir | prd-file> [--shared DIR] [--prev FILE] [--memo FILE]
-                        [--closing] [--ratify] [--json]
+usage: python3 check.py <bundle-dir | prd-file> [--shared DIR] [--prev FILE --memo FILE]
+                        [--summary FILE --seat SEAT] [--agree] [--ratify] [--json]
 
 exit 0 = pass (warnings allowed), 1 = fail, 2 = input error.
 stdlib only, Python 3.9+.
@@ -22,6 +22,7 @@ XL_INCREMENTS = 2
 NEAR_CEILING_PCT = 90
 PARKING_ENTRY_WORDS = 30
 MIN_GROWTH_WORDS = 6
+RESOLUTION_WORDS = 15
 
 DEFAULT_LIMITS = {
     "ceiling": CEILING,
@@ -48,7 +49,7 @@ HEADINGS = [
 STATUSES = {"open", "answered", "deferred", "dropped"}
 PARK_KINDS = {"idea", "planning", "other-prd", "split"}
 TIME_OK_SECTIONS = {6, 7}  # service parameters, metrics
-INCREMENTS, KEY_DECISIONS_SECTION, QUESTIONS_SECTION = 8, 10, 11
+REQUIREMENTS_SECTION, INCREMENTS, KEY_DECISIONS_SECTION, QUESTIONS_SECTION = 5, 8, 10, 11
 
 MONTHS = r"(January|February|March|April|May|June|July|August|September|October|November|December)"
 TIME_PATTERNS = [
@@ -74,6 +75,13 @@ LIST_ITEM_RE = re.compile(r"^\s*(\d+\.|[-*])\s+\S")
 SEPARATOR_RE = re.compile(r"^\|[\s\-:|]+\|$")
 EVIDENCE_LINK_RE = re.compile(r"\]\((?:\./)?(evidence/[^)#\s]+)(?:#[^)]*)?\)")
 GROWTH_RE = re.compile(r"\*\*Growth:\*\*\s*(.+)")
+Q_ID_RE = re.compile(r"^\**(Q-\d+)\**$")
+R_ID_RE = re.compile(r"^\**(R-\d+)\**$")
+R_REF_RE = re.compile(r"\bR-(\d+)\b")
+SECTION_REF_RE = re.compile(r"§\s*(\d+)")
+F_ID_RE = re.compile(r"^\**(F-\d+)\**$")
+FINDINGS_HEADING_RE = re.compile(r"^#+\s*Facilitator findings\b|^\*\*Facilitator findings:?\*\*", re.I)
+CLEARED_RE = re.compile(r"^\*\*Provisional cleared:?\*\*:?\s*(.*)$", re.I)
 
 
 class InputError(Exception):
@@ -168,6 +176,74 @@ def table_rows(lines):
             yield i, [c.strip() for c in s.strip("|").split("|")]
 
 
+def same_text(a, b):
+    """Equal ignoring line endings and trailing whitespace only."""
+    def norm(t):
+        return "\n".join(l.rstrip() for l in t.replace("\r\n", "\n").replace("\r", "\n").split("\n")).rstrip()
+    return norm(a) == norm(b)
+
+
+def question_ids(text):
+    return {m.group(1) for _, cells in table_rows(sections(text).get(QUESTIONS_SECTION, []))
+            if (m := Q_ID_RE.match(cells[0]))}
+
+
+def summary_findings(text):
+    """(F-id, owner seat) for every row of the summary's Facilitator findings section."""
+    out, inside = [], False
+    for i, line in enumerate(text.splitlines(), 1):
+        if FINDINGS_HEADING_RE.match(line.strip()):
+            inside = True
+            continue
+        if inside and line.startswith("#"):
+            break
+        if inside:
+            for _, cells in table_rows([(i, line)]):
+                m = F_ID_RE.match(cells[0])
+                if m:
+                    out.append((m.group(1), cells[1].lower().strip("* ") if len(cells) > 1 else ""))
+    return out
+
+
+def cleared_entries(memo_text):
+    """Entries under the memo's **Provisional cleared:** line (list items, or inline text)."""
+    out, inside = [], False
+    for line in memo_text.splitlines():
+        m = CLEARED_RE.match(line.strip())
+        if m:
+            inside = True
+            inline = m.group(1).strip()
+            if inline and inline.lower().rstrip(".") not in {"none", "<none>"} and not inline.startswith("<"):
+                out.append(inline)
+            continue
+        if inside:
+            s = line.strip()
+            if LIST_ITEM_RE.match(s):
+                out.append(re.sub(r"^(\d+\.|[-*])\s+", "", s))
+            elif s:
+                break
+    return out
+
+
+def load_roles(shared_dir):
+    """Role names from <shared>/roles.md (list items or table rows), lowercased; None if missing."""
+    path = Path(shared_dir) / "roles.md"
+    if not path.is_file():
+        return None
+    roles = set()
+    lines = list(enumerate(read(path, "roles").splitlines(), 1))
+    for _, line in lines:
+        s = line.strip()
+        if LIST_ITEM_RE.match(s):
+            s = re.sub(r"^(\d+\.|[-*])\s+", "", s)
+            name = re.split(r"\*\*:|:\*\*|:| — | - | – ", s, maxsplit=1)[0]
+            roles.add(name.strip("* ").lower())
+    rows = list(table_rows(lines))
+    for _, cells in rows[1:]:
+        roles.add(cells[0].strip("* ").lower())
+    return {r for r in roles if r}
+
+
 def resolve_prd(target):
     p = Path(target)
     if p.is_file():
@@ -206,8 +282,15 @@ def load_limits(shared_dir):
 
 # ---------- the check ----------
 
-def check(prd_path, parking_path, shared_dir, prev=None, memo=None, closing=False, ratify=False):
-    closing = closing or ratify
+def check(prd_path, parking_path, shared_dir, prev=None, memo=None, agree=False, ratify=False,
+          summary=None, seat=None):
+    if prev and not memo:
+        raise InputError("--prev needs --memo: pass this turn's memo (turns/<round>-<seat>.md)")
+    if agree and not prev:
+        raise InputError("--agree needs --prev and --memo: the PRD version this seat received, and its memo")
+    if summary and not (memo and seat):
+        raise InputError("--summary needs --memo and --seat: whose findings to check, in which memo")
+    no_open = agree or ratify
     prd_path = Path(prd_path)
     shared_dir = Path(shared_dir)
     prd_name = prd_path.name
@@ -215,6 +298,7 @@ def check(prd_path, parking_path, shared_dir, prev=None, memo=None, closing=Fals
     limits = load_limits(shared_dir)
     prev_text = read(prev, "--prev") if prev else None
     memo_text = read(memo, "--memo") if memo else None
+    summary_text = read(summary, "--summary") if summary else None
     parking = read(parking_path, "parking lot") if Path(parking_path).is_file() else None
 
     r = Result(prd=str(prd_path))
@@ -252,6 +336,9 @@ def check(prd_path, parking_path, shared_dir, prev=None, memo=None, closing=Fals
             g = GROWTH_RE.search(memo_text or "")
             if not g or len(g.group(1).split()) < MIN_GROWTH_WORDS:
                 r.fail("GROWTH", "the PRD grew but the memo has no growth justification", prd_name)
+    if agree and not same_text(prd, prev_text):
+        r.fail("AGREE", "an agreement turn leaves the PRD exactly as received; any change is a normal turn",
+               prd_name)
     if memo_text is not None:
         mw = words(memo_text)
         if mw > limits["memo_words"]:
@@ -320,6 +407,8 @@ def check(prd_path, parking_path, shared_dir, prev=None, memo=None, closing=Fals
 
     # open questions
     counts = {s: 0 for s in ("open", "answered", "deferred", "dropped")}
+    r_ids = {m.group(1) for _, cells in table_rows(sec.get(REQUIREMENTS_SECTION, [])) if (m := R_ID_RE.match(cells[0]))}
+    section_nums = set(range(1, len(HEADINGS) + 1)) & set(sec)
     rows = list(table_rows(sec.get(QUESTIONS_SECTION, [])))
     for i, cells in rows[1:]:
         if not re.match(r"^\**Q-\d+\**$", cells[0]):
@@ -340,11 +429,45 @@ def check(prd_path, parking_path, shared_dir, prev=None, memo=None, closing=Fals
             r.fail("QUESTIONS", "deferred needs an owner role and a trigger", prd_name, i)
         if status in {"answered", "dropped"} and not cells[6]:
             r.fail("QUESTIONS", f"{status} needs a resolution", prd_name, i)
+        elif status == "answered":
+            refs = R_REF_RE.findall(cells[6])
+            secs = SECTION_REF_RE.findall(cells[6])
+            dangling = [f"R-{x}" for x in refs if f"R-{x}" not in r_ids]
+            dangling += [f"§{x}" for x in secs if int(x) not in section_nums]
+            if not refs and not secs:
+                r.fail("QUESTIONS", "an answered resolution points to where the answer lives (→ R-n or → §n)",
+                       prd_name, i)
+            elif dangling:
+                r.fail("QUESTIONS", f"resolution points to {', '.join(dangling)}, which is not in the PRD",
+                       prd_name, i)
+            if words(cells[6]) > RESOLUTION_WORDS:
+                r.fail("QUESTIONS", f"resolution is {words(cells[6])} words; a pointer is at most "
+                       f"{RESOLUTION_WORDS}", prd_name, i)
     provisional = len(PROVISIONAL_RE.findall(prd))
     r.notes.append("questions: " + " · ".join(f"{k} {v}" for k, v in counts.items())
                    + f" · provisional values: {provisional}")
-    if closing and counts["open"]:
-        r.fail("CLOSING", f"{counts['open']} questions still open", prd_name)
+    if no_open and counts["open"]:
+        r.fail("OPEN-QUESTIONS", f"{counts['open']} questions still open; converging needs none", prd_name)
+    if prev_text is not None:
+        gone = sorted(question_ids(prev_text) - question_ids(prd), key=lambda q: int(q[2:]))
+        if gone:
+            r.fail("QUESTIONS-REMOVED", f"{', '.join(gone)} removed; closed questions stay and IDs are never "
+                   "reused", prd_name)
+        cleared = len(PROVISIONAL_RE.findall(prev_text)) - provisional
+        if cleared > 0:
+            entries = cleared_entries(memo_text or "")
+            roles = load_roles(shared_dir)
+            if roles is None:
+                ok = [e for e in entries if e.strip()]
+                r.warn("PROVISIONAL-CLEARED", "no roles.md found; cleared-value justifications not checked "
+                       "against roles")
+            else:
+                ok = [e for e in entries if "evidence/" in e
+                      or any(re.search(rf"\b{re.escape(role)}\b", e, re.I) for role in roles)]
+            if len(ok) < cleared:
+                r.fail("PROVISIONAL-CLEARED", f"{cleared} provisional values cleared but the memo justifies "
+                       f"{len(ok)}; each needs an evidence link or the role whose authority settles it",
+                       Path(memo).name if memo else prd_name)
     if ratify and provisional:
         r.fail("PROVISIONAL", f"{provisional} [provisional] values remain; a ratified PRD has none", prd_name)
 
@@ -372,6 +495,17 @@ def check(prd_path, parking_path, shared_dir, prev=None, memo=None, closing=Fals
             if ew > limits["parking_entry_words"]:
                 r.warn("PARKING-LONG", f"entry is {ew} words (item + why); keep it to one line of about "
                        f"{limits['parking_entry_words']}", pname, i)
+
+    # facilitator findings owned by this seat must be answered by ID in its memo
+    if summary_text is not None:
+        mine = [f for f, owner in summary_findings(summary_text) if owner == seat.lower()]
+        missing = [f for f in mine if not re.search(rf"\b{re.escape(f)}\b", memo_text)]
+        if missing:
+            r.fail("FINDINGS", f"{', '.join(missing)} not answered (accepted or rejected, by ID)",
+                   Path(memo).name)
+
+    if limits["xl_increments"] and xl == limits["xl_increments"]:
+        r.warn("XL-AT-LIMIT", f"{xl} XL increments is the limit; could one be smaller or split?", prd_name)
 
     # split signals
     signals = []
@@ -416,9 +550,12 @@ def main(argv=None):
     ap.add_argument("target", help="bundle directory or PRD file")
     ap.add_argument("--shared", help="the portfolio's _shared directory (default: <bundle>/../_shared)")
     ap.add_argument("--prev", help="the previous PRD version")
-    ap.add_argument("--memo", help="this turn's memo")
-    ap.add_argument("--closing", action="store_true", help="closing turn: no open questions")
-    ap.add_argument("--ratify", action="store_true", help="ratification: implies --closing, no [provisional]")
+    ap.add_argument("--memo", help="this turn's memo (required with --prev)")
+    ap.add_argument("--summary", help="the latest round summary, for facilitator findings (needs --seat)")
+    ap.add_argument("--seat", help="the seat taking this turn, whose findings the memo must answer")
+    ap.add_argument("--agree", action="store_true",
+                    help="agreement turn: PRD unchanged from --prev, no open questions")
+    ap.add_argument("--ratify", action="store_true", help="ratification: no open questions, no [provisional]")
     ap.add_argument("--json", action="store_true", help="machine-readable report")
     a = ap.parse_args(argv)
 
@@ -426,7 +563,8 @@ def main(argv=None):
         prd_path = resolve_prd(a.target)
         bundle = prd_path.resolve().parent
         shared = Path(a.shared) if a.shared else bundle.parent / "_shared"
-        r = check(prd_path, bundle / "parking-lot.md", shared, a.prev, a.memo, a.closing, a.ratify)
+        r = check(prd_path, bundle / "parking-lot.md", shared, a.prev, a.memo, a.agree, a.ratify,
+                  a.summary, a.seat)
     except InputError as e:
         if a.json:
             print(json.dumps({"result": "ERROR", "message": str(e)}))

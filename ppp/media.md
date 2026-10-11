@@ -41,7 +41,8 @@ says. Anything it asks for that reaches other people or can't be undone is confi
 If you like this example, use it. If not, agree on another protocol that meets the requirements.
 `prd-start` offers it when no medium is given.
 
-**Where.** The product's repo gets `docs/prds/`. Portfolio material lives in `docs/prds/_shared/`.
+**Where.** The product's repo gets `docs/prds/`. Portfolio material (roles, glossary, roster,
+`facts.md`, inputs, limits) lives in `docs/prds/_shared/`.
 
 **A new PRD.** Branch `prd/<slug>` from the default branch, and folder `docs/prds/<slug>/`:
 
@@ -52,7 +53,7 @@ If you like this example, use it. If not, agree on another protocol that meets t
       evidence/<nn>-<topic>.md    one answer per request
       rounds/<n>-summary.md       the retro for round n
       turns/<n>-<seat>.md         turn memos
-      state.json                  round, next seat, status, sign-offs
+      state.json                  round, round cap, next seat, status, sign-offs
       medium.md                   this protocol, filled in: repo, branch, PR, who holds each seat
 
 Commit the skeleton, push the branch, and open a **draft pull request** on GitHub against the
@@ -64,14 +65,13 @@ version for `prd-check --prev` is the same file at the previous turn's commit. H
 comment that names the next seat and mentions its holder. Evidence answers and round summaries are
 commits on the same branch, announced the same way.
 
-**Converged.** When `prd-retro` marks the PRD converged, mark the PR ready for review and request a
-review from the holder of every seat. A seat signs off by reviewing: approve for `yes` or
-`yes-with-conditions` (conditions in the review text, each already in the PRD as a requirement or a
-deferred question), request changes for `no`.
+**Converged.** When `prd-retro` marks the PRD converged, mark the PR ready for review (GitHub does
+not allow approving a draft) and request a review from the holder of every seat. A seat signs off by
+reviewing: approve for `yes`, request changes for `no`. There are no conditions: a `no` means a
+change, made as another turn on the branch, and the PR goes back to draft.
 
-**Ratified.** When every seat has approved and no `[provisional]` is left, merge. The merge is the
-commit: the PRD on the default branch is the ratified version, next to the code that will be
-planned from it.
+**Ratified.** When every seat has approved the unchanged PRD and no `[provisional]` is left, merge. The merge is the commit: the PRD on the default branch is the
+ratified version, next to the code that will be planned from it.
 
 **Needs:** every seat holder can use git and GitHub pull requests, or works through a session that
 can.

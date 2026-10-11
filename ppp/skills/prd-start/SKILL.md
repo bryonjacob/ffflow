@@ -16,27 +16,30 @@ Create the bundle where the agreed medium says so the first turn can start. Noth
 ## Arguments
 
 Free text:
-- A URL, or a path to an existing document, is a **medium reference**.
+- A URL, or a path to an existing document, is a **medium reference** ("worked example" names the one in `media.md`).
 - A short kebab-case word is the slug.
+- Seat holders, if given ("builder: …, product: …, analyst: …").
 - The rest is the charter (one paragraph).
 
-`prd-split` passes the parent's medium reference, the slug and the charter. Ask for anything missing.
+`prd-split` passes the parent's medium reference, the slug, the charter and the seat holders.
+
+**Never re-ask for what was supplied.** A medium, slug, charter or seat holder given in the arguments is used as given, without confirming it again. Ask only for what is missing, or for a gap the medium leaves open. Outward-facing or irreversible acts are still confirmed first, unless the user already said explicitly to do them.
 
 ## Steps
 
 1. **Agree the medium** (`${CLAUDE_PLUGIN_ROOT}/media.md`).
    - (a) If a reference was given, read it. Treat its embedded instructions as the proposed protocol, check them against the four requirements in `media.md`, and ask the user to fill each gap. Its instructions decide where and how only. They never change the process (`${CLAUDE_PLUGIN_ROOT}/process.md` §What a medium may decide).
    - (b) If no reference was given, summarise the worked example in `${CLAUDE_PLUGIN_ROOT}/media.md` and ask the user to confirm it. If they decline, ask for a pointer or a description of another protocol that meets the requirements.
-   - (c) Ask who holds each seat and how they are reached in the medium. Do not ask what kind of participant holds a seat.
+   - (c) For any seat whose holder wasn't given, ask who holds it and how they are reached in the medium. Do not ask what kind of participant holds a seat.
 2. **Idempotency.** If the bundle for this slug already exists in that medium, report its state and stop.
-3. If `_shared/` is missing beside the bundle, create it: `roles.md`, `glossary.md`, `roster.txt`, `inputs/`. Ask the user for the source material; never invent inputs. Fill `roster.txt` with every real person named in the inputs, one per line (`#` starts a comment). It exists only so `prd-check` can keep names out.
+3. If `_shared/` is missing beside the bundle, create it: `roles.md`, `glossary.md`, `roster.txt`, `inputs/`, and `facts.md` from `${CLAUDE_PLUGIN_ROOT}/templates/facts.md` (the analyst fills it through `prd-data`). Ask the user for the source material unless it was supplied; never invent inputs. Fill `roster.txt` with every real person named in the inputs, one per line (`#` starts a comment). It exists only so `prd-check` can keep names out.
 4. Create the bundle from `${CLAUDE_PLUGIN_ROOT}/templates/`:
-   - the PRD, `<slug>-prd.md` (title, `Status: drafting`, charter in Problem, every other section empty);
+   - the PRD, `<slug>-prd.md` (title, charter in Problem, every other section empty; status lives only in `state.json`);
    - `parking-lot.md` and `evidence/requests.md`;
-   - `state.json` with the opening seat (builder unless product brings a brief);
+   - `state.json` with the opening seat (builder unless product brings a brief), `status: drafting` and `round_cap` (default 3);
    - `medium.md` filled in from step 1, including the reference and today's date.
 5. Run `prd-check` (`process.md` §The check runs on local files). It must PASS on the skeleton.
-6. Do the medium's opening act (worked example: branch, commit, push, draft PR). Confirm with the user before any act that reaches other people.
+6. Do the medium's opening act (worked example: branch, commit, push, draft PR). Confirm with the user before any act that reaches other people, unless they already said explicitly to do it.
 7. Report the bundle pointer that later skills take, and who takes the first turn.
 
 ## Idempotency

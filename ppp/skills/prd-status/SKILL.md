@@ -16,7 +16,7 @@ This skill does NOT invoke Plan Mode. It only reads and reports.
 
 ## One PRD
 
-Medium (Reference from `medium.md`) · round and next seat · status (drafting / converged / ratified) · words and growth per turn · open / answered / deferred / dropped · `[provisional]` count · parking lot by kind · data requests open · sign-off per seat · the last round summary's "next round must".
+Medium (Reference from `medium.md`) · round, round cap and next seat · status (drafting / converged / ratified) · words and growth per turn · open / answered / deferred / dropped · `[provisional]` count · facilitator findings not yet answered, by owner seat · parking lot by kind · split proposals and who has accepted · data requests open · sign-off per seat (`yes` / `no` / not yet) · the last round summary's "next round must".
 
 Get the metrics from `python3 "${CLAUDE_PLUGIN_ROOT}/skills/prd-check/check.py" <local bundle> --json` (`check.py` sits beside prd-check's SKILL.md), and growth per turn from the versions `medium.md` says.
 

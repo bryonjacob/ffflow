@@ -1,6 +1,6 @@
 # PPP — plugin design notes
 
-PPP (product ping-pong) turns a product ask into a PRD both sides can stand behind. A builder seat and a product seat take turns revising one PRD under mechanical checks; an analyst seat answers data requests neutrally; whatever doesn't belong is parked; every round ends with a retro on the record; the PRD converges when no question is open and is ratified when every seat signs off with nothing provisional left. The process is defined over text documents and is indifferent to where they live: each PRD's medium is agreed when it starts and recorded in its bundle.
+PPP (product ping-pong) turns a product ask into a PRD both sides can stand behind. A builder seat and a product seat take turns revising one PRD under mechanical checks; an analyst seat answers data requests neutrally; whatever doesn't belong is parked; every round ends with a retro on the record; the PRD converges when a seat hands it back unchanged with no question open, and is ratified when every seat signs off `yes` with nothing provisional left. The process is defined over text documents and is indifferent to where they live: each PRD's medium is agreed when it starts and recorded in its bundle.
 
 ## Layout
 
@@ -10,7 +10,7 @@ ppp/
 ├── process.md                   the process contract every skill implements
 ├── media.md                     what a medium must do; the repo + draft-PR worked example
 ├── seats/                       builder, product, analyst briefs
-├── templates/                   prd, parking-lot, memo, evidence, round-summary, requests, state.json, medium
+├── templates/                   prd, parking-lot, memo, evidence, round-summary, requests, facts, state.json, medium
 ├── skills/                      prd-start, prd-turn, prd-check (+ check.py), prd-retro, prd-data, prd-split, prd-status
 ├── tests/                       test_check.py + fixtures/
 ├── docs/prds/ppp/               PPP's own design bundle (dogfood)
@@ -28,6 +28,10 @@ ppp/
 - **Each skill has a `## Plan Mode` section** stating that it does not invoke Plan Mode, and why.
 - **Skills only.** No agents, hooks or MCP servers.
 - **Idempotent and resumable from state.** Every skill can be re-run; `state.json` says where things stand.
+- **The facilitator never edits the PRD.** What `prd-retro` notices goes in the round summary as numbered findings (`F-n`), answered by the owning seat's next memo. Only `prd-retro` sets `status`.
+- **Convergence is a no-edit agreement turn.** Handing the PRD over means "I'd sign this as it stands"; a seat agrees by handing it back byte-identical. Sign-off is `yes` or `no`; a condition is a change, made in a turn. No special closing round.
+- **DRY: each fact lives once.** An answered question's resolution only points to where the answer lives (`→ R-n`, `→ §n`); status lives only in `state.json`; facts live in `_shared/facts.md` or evidence files and are cited.
+- **Never re-ask for what was supplied.** Skills use arguments as given; only outward-facing or irreversible acts are confirmed, unless the user already said to do them.
 
 ## Tests
 

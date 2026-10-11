@@ -104,13 +104,13 @@ Configure once in `.ffflow/config.yaml`; the right cartridge loads when needed.
 
 ## ppp — product ping-pong
 
-A builder seat and a product seat take turns revising one PRD, and every turn must pass a mechanical check (no names, no estimates, no history, no bloat) before it lands. What doesn't belong goes to a parking lot, an analyst seat answers data requests neutrally, and each round ends with a retro on the record. The PRD converges when no question is open, and is ratified when every seat signs off with nothing provisional left.
+A builder seat and a product seat take turns revising one PRD, and every turn must pass a mechanical check (no names, no estimates, no history, no bloat) before it lands. What doesn't belong goes to a parking lot, an analyst seat answers data requests neutrally, and each round ends with a retro on the record. The PRD converges when a seat hands it back unchanged with no question open, and is ratified when every seat signs off `yes` with nothing provisional left.
 
 ```
 /ppp:prd-start [<medium>]               Agree the medium, seat the parties, create the bundle.
 /ppp:prd-turn --seat builder|product    Take one turn: respond, revise, park, ask, memo, check.
 /ppp:prd-data                           Analyst seat: answer open data requests with evidence.
-/ppp:prd-retro                          Close the round: retro, tidy the lot, summary; converge, ratify.
+/ppp:prd-retro                          Close the round: retro, tidy the lot, summary, findings; converge, ratify.
 /ppp:prd-check                          The mechanical rules (also run inside every turn).
 /ppp:prd-split                          Carve a growing thread into its own PRD.
 /ppp:prd-status                         Where one PRD, or the whole portfolio, stands.

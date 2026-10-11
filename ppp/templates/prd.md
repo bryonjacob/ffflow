@@ -1,7 +1,5 @@
 # <Title>
 
-Status: drafting
-
 ## 1. Problem
 <Who is hurting, how, and why it matters now. Cite evidence by linking its file in evidence/.>
 

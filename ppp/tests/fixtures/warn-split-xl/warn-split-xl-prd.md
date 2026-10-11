@@ -53,6 +53,6 @@ owner ([E-01](evidence/01-requests.md)).
 | ID | ? | Question | Raised by | Owner (role) | Status | Resolution |
 |---|---|---|---|---|---|---|
 | Q-1 | ? | Which channel do clients use to raise requests? | builder | product | open | |
-| Q-2 | | Is the window set per client? | product | product | answered | Yes, configurable per client |
+| Q-2 | | Is the window set per client? | product | product | answered | → §6 Acknowledgement window |
 | Q-3 | | Should requests close on their own? | builder | account owner | deferred | Revisit when the unowned share meets its target |
 | Q-4 | | Should owners rotate? | product | product | dropped | Any owner can pick up any request |

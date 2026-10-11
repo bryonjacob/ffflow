@@ -1,4 +1,4 @@
-# E-01: what the first simulated ping-pong produced
+# E-01: what the first trial ping-pong produced
 
 **Question:** what happens when two blind agents negotiate a PRD with only a loose protocol? (builder)
 **Method:** three rounds on a client-request pipeline PRD; after every turn a small measurement

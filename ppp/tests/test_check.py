@@ -92,7 +92,24 @@ class JsonReport(unittest.TestCase):
         self.assertIn("✗ TIME", proc.stdout)
 
     def test_unreadable_prev_is_input_error(self):
-        code, report, _ = run_check(".", ["--prev", "missing.md"], cwd=FIXTURES / "pass-good")
+        code, report, _ = run_check(".", ["--prev", "missing.md", "--memo", "missing.md"],
+                                    cwd=FIXTURES / "pass-good")
+        self.assertEqual(code, 2)
+
+    def test_flag_combinations_are_input_errors(self):
+        cases = {
+            ("--prev", "prev.md"): "--prev needs --memo",
+            ("--agree", "--memo", "memo.md"): "--agree needs --prev",
+            ("--summary", "summary.md", "--memo", "memo.md"): "--summary needs --memo and --seat",
+        }
+        for args, message in cases.items():
+            with self.subTest(args=args):
+                code, report, _ = run_check(".", list(args), cwd=FIXTURES / "pass-findings")
+                self.assertEqual(code, 2)
+                self.assertIn(message, report["message"])
+
+    def test_closing_flag_is_gone(self):
+        code, _, _ = run_check(".", ["--closing"], cwd=FIXTURES / "pass-good")
         self.assertEqual(code, 2)
 
 

@@ -37,7 +37,7 @@ A comment on the draft PR naming the next seat and mentioning its holder. Eviden
 summaries are commits on the same branch, announced the same way.
 
 ## Converged, sign-off and commit
-Converged: mark the draft PR ready for review and request a review from every seat holder. Sign-off:
-approve for `yes` or `yes-with-conditions` (conditions in the review text), request changes for
-`no`. Commit: merge to the default branch once every seat has approved and no `[provisional]` is
-left.
+Converged: mark the PR ready for review and request a review from every seat holder. Sign-off:
+approve for `yes`, request changes for `no` (a `no` is a change, made as another turn; the PR goes
+back to draft). Commit: once every seat has approved and no `[provisional]` is left, merge it to the
+default branch.

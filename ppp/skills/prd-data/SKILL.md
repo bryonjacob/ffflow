@@ -1,6 +1,6 @@
 ---
 name: prd-data
-description: Fill the PPP analyst seat — answer the open data requests in a PRD bundle with evidence files, neutrally. Use between turns whenever evidence/requests.md has open requests.
+description: Fill the PPP analyst seat — answer the open data requests in a PRD bundle with evidence files, neutrally, and keep the portfolio's facts.md. Use between turns, or while a retro runs, whenever evidence/requests.md has open requests.
 ---
 
 # prd-data
@@ -20,7 +20,8 @@ Turn "I think" into "the data says". Evidence is what moves positions; this seat
 2. Answer exactly the question asked. Use the sources the bundle points to (repo, issue tracker, analytics, documents in `_shared/inputs/`). Read-only: never change a system to get a number.
 3. Write `evidence/<nn>-<topic>.md` from `${CLAUDE_PLUGIN_ROOT}/templates/evidence.md`: question · method · result · as-of · caveats. Method must be repeatable by someone else.
 4. Update the request's Status: `answered` with a link to the evidence file in Answer, or `cannot-answer` with what it would take.
-5. Write back and announce the answers as `medium.md` says.
+5. **Keep `_shared/facts.md`** (from `${CLAUDE_PLUGIN_ROOT}/templates/facts.md` if missing). A fact the answer settles goes in as one row: value, source, as-of. When sources disagree, record which wins and why (the newer read, the system of record, the narrower method), and link the evidence file. Each fact has one row; correct it in place rather than adding a second.
+6. Write back and announce the answers as `medium.md` says. This can run while `prd-retro` does.
 
 ## Rules
 
