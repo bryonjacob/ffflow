@@ -6,7 +6,7 @@ This file is for humans. Its machine-readable sibling — [`plugin/docs/migratio
 
 The format is loosely [Keep a Changelog](https://keepachangelog.com/); versioning is [semver as defined in the root `CLAUDE.md`](CLAUDE.md#how-we-version).
 
-> **Marketplace catalog** (`metadata.version` in `.claude-plugin/marketplace.json`): **0.5.0** (2026-10-11) adds `ppp` 0.1.0 and moves plugin versions out of the catalog entries into each plugin.json. `fff` unchanged at 0.4.2.
+> **Marketplace catalog** (`metadata.version` in `.claude-plugin/marketplace.json`): **0.5.0** (2026-10-13) adds `ppp` (ships at 0.2.0) and moves plugin versions out of the catalog entries into each plugin.json. `fff` unchanged at 0.4.2.
 
 ---
 

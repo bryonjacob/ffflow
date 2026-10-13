@@ -4,7 +4,7 @@ All notable changes to the `ppp` plugin. Versions track `ppp/.claude-plugin/plug
 
 ---
 
-## [0.2.0] — 2026-10-11
+## [0.2.0] — 2026-10-13
 
 **Breaking.** The convergence rule, sign-off values and question resolutions change. A bundle already in flight must replace any conditional sign-off (the removed third value, in `state.json` and memos) with `yes` or `no`, turning each condition into a change made in a turn, and rewrite every answered question's Resolution as a pointer (`→ R-n` or `→ §n`, ≤ 15 words) with the answer moved into the PRD. Calls to `check.py --closing` become `--agree` (agreement turn) or `--ratify`.
 
@@ -32,7 +32,7 @@ All notable changes to the `ppp` plugin. Versions track `ppp/.claude-plugin/plug
 - Analyst data requests may run in parallel with the retro.
 - `prd-split` handles a parent that is still an empty skeleton: the child starts from the charter alone, and the parent still gets its Non-goals pointer.
 
-## [0.1.0] — 2026-10-11
+## [0.1.0] — 2026-10-13
 
 ### Added
 - **The process kit.** `process.md` (seats, the bundle, finding a bundle, the PRD rules, parking lot, turns, data requests, rounds and convergence, retro, split signals, the evidence rule, exit); `media.md` (what a medium must do, bringing your own medium document, and the repo + draft-PR worked example); templates for the PRD, parking lot, memo (with **Cut** and **Key decisions kept** lines), evidence, round summary, `requests.md`, `state.json` and `medium.md`; seat briefs for builder, product and analyst.
