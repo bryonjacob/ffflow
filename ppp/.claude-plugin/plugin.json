@@ -1,0 +1,9 @@
+{
+  "name": "ppp",
+  "description": "PPP (product ping-pong) — builder and product seats negotiate a PRD turn by turn under mechanical checks, with a parking lot, neutral data requests and a retro every round, until it converges and is ratified. Works in whatever medium the seats agree on.",
+  "version": "0.2.0",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Bryon"
+  }
+}

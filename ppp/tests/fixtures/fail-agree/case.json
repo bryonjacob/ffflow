@@ -1,0 +1,16 @@
+{
+  "target": ".",
+  "args": [
+    "--agree",
+    "--prev",
+    "prev.md",
+    "--memo",
+    "memo.md"
+  ],
+  "exit": 1,
+  "fails": [
+    "AGREE"
+  ],
+  "warns": [],
+  "fail_counts": {}
+}

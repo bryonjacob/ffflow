@@ -1,0 +1,15 @@
+{
+  "target": ".",
+  "args": [
+    "--prev",
+    "prev.md",
+    "--memo",
+    "memo.md"
+  ],
+  "exit": 1,
+  "fails": [
+    "QUESTIONS-REMOVED"
+  ],
+  "warns": [],
+  "fail_counts": {}
+}

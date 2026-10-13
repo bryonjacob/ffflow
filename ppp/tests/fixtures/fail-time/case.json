@@ -1,0 +1,10 @@
+{
+  "target": ".",
+  "args": [],
+  "exit": 1,
+  "fails": [
+    "TIME"
+  ],
+  "warns": [],
+  "fail_counts": {}
+}

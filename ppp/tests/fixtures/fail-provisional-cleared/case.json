@@ -1,0 +1,15 @@
+{
+  "target": ".",
+  "args": [
+    "--prev",
+    "prev.md",
+    "--memo",
+    "memo.md"
+  ],
+  "exit": 1,
+  "fails": [
+    "PROVISIONAL-CLEARED"
+  ],
+  "warns": [],
+  "fail_counts": {}
+}

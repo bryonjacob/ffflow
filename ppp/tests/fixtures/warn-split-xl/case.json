@@ -1,0 +1,13 @@
+{
+  "target": ".",
+  "args": [],
+  "exit": 0,
+  "fails": [],
+  "warns": [
+    "SPLIT"
+  ],
+  "fail_counts": {},
+  "metrics": {
+    "xl_increments": 3
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "target": ".",
+  "args": [],
+  "exit": 2,
+  "fails": [],
+  "warns": [],
+  "fail_counts": {}
+}

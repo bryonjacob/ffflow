@@ -1,0 +1,8 @@
+{
+  "target": "../pass-good/pass-good-prd.md",
+  "args": [],
+  "exit": 0,
+  "fails": [],
+  "warns": [],
+  "fail_counts": {}
+}

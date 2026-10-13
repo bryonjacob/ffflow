@@ -1,0 +1,13 @@
+{
+  "target": ".",
+  "args": [
+    "--shared",
+    "../_nonexistent"
+  ],
+  "exit": 0,
+  "fails": [],
+  "warns": [
+    "NAME"
+  ],
+  "fail_counts": {}
+}

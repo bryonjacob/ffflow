@@ -1,0 +1,13 @@
+{
+  "target": ".",
+  "args": [],
+  "exit": 0,
+  "fails": [],
+  "warns": [
+    "XL-AT-LIMIT"
+  ],
+  "fail_counts": {},
+  "metrics": {
+    "xl_increments": 2
+  }
+}

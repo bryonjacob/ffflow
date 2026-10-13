@@ -1,10 +1,12 @@
 # Changelog
 
-All notable changes to FFFlow. Versions track `plugin/.claude-plugin/plugin.json`.
+All notable changes to the **fff** plugin. Versions track `plugin/.claude-plugin/plugin.json`. The `ppp` plugin keeps its own [ppp/CHANGELOG.md](ppp/CHANGELOG.md).
 
 This file is for humans. Its machine-readable sibling — [`plugin/docs/migrations.md`](plugin/docs/migrations.md) — is what `/fff:upgrade-ffflow` actually reads: same releases, but each entry carries a detection heuristic and a remediation for repo-affecting changes. **When a release changes what a project's files should look like, it needs an entry in both.**
 
 The format is loosely [Keep a Changelog](https://keepachangelog.com/); versioning is [semver as defined in the root `CLAUDE.md`](CLAUDE.md#how-we-version).
+
+> **Marketplace catalog** (`metadata.version` in `.claude-plugin/marketplace.json`): **0.5.0** (2026-10-13) adds `ppp` (ships at 0.2.0) and moves plugin versions out of the catalog entries into each plugin.json. `fff` unchanged at 0.4.2.
 
 ---
 

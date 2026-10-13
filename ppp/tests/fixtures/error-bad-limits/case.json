@@ -1,0 +1,11 @@
+{
+  "target": ".",
+  "args": [
+    "--shared",
+    "../_shared-badlimits"
+  ],
+  "exit": 2,
+  "fails": [],
+  "warns": [],
+  "fail_counts": {}
+}

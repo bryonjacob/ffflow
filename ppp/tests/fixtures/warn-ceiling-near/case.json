@@ -1,0 +1,13 @@
+{
+  "target": ".",
+  "args": [
+    "--shared",
+    "../_shared-tight"
+  ],
+  "exit": 0,
+  "fails": [],
+  "warns": [
+    "CEILING-NEAR"
+  ],
+  "fail_counts": {}
+}

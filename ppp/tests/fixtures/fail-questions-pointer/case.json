@@ -1,0 +1,12 @@
+{
+  "target": ".",
+  "args": [],
+  "exit": 1,
+  "fails": [
+    "QUESTIONS"
+  ],
+  "warns": [],
+  "fail_counts": {
+    "QUESTIONS": 4
+  }
+}

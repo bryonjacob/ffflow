@@ -1,0 +1,17 @@
+{
+  "target": ".",
+  "args": [
+    "--prev",
+    "prev.md",
+    "--memo",
+    "memo.md",
+    "--shared",
+    "../_shared-noroles"
+  ],
+  "exit": 0,
+  "fails": [],
+  "warns": [
+    "PROVISIONAL-CLEARED"
+  ],
+  "fail_counts": {}
+}

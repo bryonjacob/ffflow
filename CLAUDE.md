@@ -1,44 +1,60 @@
 # FFFlow — repository root
 
-This repo is both a **Claude Code marketplace** and the **plugin** it ships. The plugin's own design docs live in [`plugin/CLAUDE.md`](plugin/CLAUDE.md) and [`plugin/docs/architecture.md`](plugin/docs/architecture.md) — read those for skill design. This file covers repo-level process.
+This repo is a Claude Code marketplace shipping two independent plugins: **fff** (`plugin/`; design in [`plugin/CLAUDE.md`](plugin/CLAUDE.md), [`plugin/docs/architecture.md`](plugin/docs/architecture.md)) and **ppp** (`ppp/`; design in [`ppp/CLAUDE.md`](ppp/CLAUDE.md), [`ppp/process.md`](ppp/process.md)). This file covers repo-level process.
 
 ## Layout
 
 ```
 ffflow-plugin/
-├── .claude-plugin/marketplace.json    # marketplace manifest (this repo as a marketplace)
-├── plugin/                            # the actual plugin (source: "./plugin")
-│   ├── .claude-plugin/plugin.json     # plugin manifest
+├── .claude-plugin/marketplace.json    # the catalog: lists both plugins; versions only itself
+├── plugin/                            # fff (source: "./plugin")
+│   ├── .claude-plugin/plugin.json     # fff manifest; fff's version
 │   ├── docs/migrations.md             # migration ledger read by /fff:upgrade-ffflow
-│   └── CLAUDE.md                      # plugin design (authoritative for skills)
-├── CHANGELOG.md                       # human-facing release history
+│   └── CLAUDE.md                      # fff design (authoritative for fff skills)
+├── ppp/                               # ppp (source: "./ppp")
+│   ├── .claude-plugin/plugin.json     # ppp manifest; ppp's version
+│   ├── CHANGELOG.md                   # ppp release history
+│   ├── tests/                         # check.py unittest suite + fixtures
+│   └── CLAUDE.md                      # ppp design (authoritative for ppp skills)
+├── CHANGELOG.md                       # fff release history + catalog notes
 ├── README.md
 └── LICENSE
 ```
 
 ## How we version
 
-**Three version fields, kept in lockstep.** Bump all three together on every release:
+**A plugin's version lives in exactly one place: its own `.claude-plugin/plugin.json`.**
+- fff → `plugin/.claude-plugin/plugin.json`
+- ppp → `ppp/.claude-plugin/plugin.json`
 
-1. `.claude-plugin/marketplace.json` → `metadata.version`
-2. `.claude-plugin/marketplace.json` → `plugins[0].version`
-3. `plugin/.claude-plugin/plugin.json` → `version`
+Never put `version` in a `plugins[]` entry of `marketplace.json`. When both are set, plugin.json
+wins silently, so a second copy can only drift and mislead.
 
-They track the same thing because there's one plugin in this marketplace. Keeping them aligned is the simplest mental model — don't let them drift.
+**The catalog has its own version:** `metadata.version` in `marketplace.json`. It versions the
+list, not the plugins:
+- **minor** — a plugin is added or removed.
+- **patch** — any existing entry changes (description, keywords, category, source).
+- A plugin release on its own does not touch `marketplace.json`.
 
-**Semver, content-based:**
+**Each plugin is semver'd independently, by content:**
+- **patch** — additive or backward-compatible: new cartridges or recipes, restructured-but-equivalent
+  content, doc fixes, new stack/language support, new check fixtures.
+- **minor** — new skills, new user-facing capability, or a meaningful workflow addition.
+- **major** — removing or renaming a skill, or breaking a documented interface (recipe names,
+  `--type` values, config schema, PPP's bundle format or check rule codes).
 
-- **patch** (`0.2.0 → 0.2.1`) — additive or backward-compatible: new recipes/cartridges, restructured-but-equivalent content, doc fixes, new stack/language support.
-- **minor** (`0.2.x → 0.3.0`) — new skills, new user-facing capability, or a meaningful workflow addition.
-- **major** (`0.x → 1.0`) — removing/renaming a skill or changing a documented interface (recipe names, `--type` values, config schema) in a breaking way.
+**Always bump. This is mandatory, not hygiene.** Once a plugin.json carries a version, Claude Code
+decides whether an installed copy is out of date by comparing that string. Users stay on their
+cached copy until it changes. A change shipped without a bump never reaches existing installs.
+(Only a plugin with no version anywhere follows the latest commit.) Every change to a plugin's
+shipped files bumps that plugin's version, doc fixes included.
 
-**Why bump at all?** Claude Code picks up the latest commit on plugin update regardless of the number — the version is the *human* signal that something changed (and what the update UI compares). A static version across a real change is a footgun; always bump.
+## Every release updates its plugin's ledgers
 
-## Every release updates two ledgers
+Versioning is only half the job. A release also has to tell **existing users and projects** what changed for them.
 
-Versioning is only half the job. A release also has to tell **existing projects** what changed for them.
-
-1. **`CHANGELOG.md`** (repo root) — for humans. Every release gets an entry.
+**fff:**
+1. **`CHANGELOG.md`** (repo root) — for humans. Every fff release gets an entry.
 2. **`plugin/docs/migrations.md`** — for `/fff:upgrade-ffflow`. Only **repo-affecting** releases get an entry: ones where an already-adopted project would be wrong or incomplete until something in it changes.
 
 The test: *"If I upgrade the plugin and change nothing in my repo, is my repo now inconsistent with FFFlow?"* Yes → migration entry required. New skill that only reads existing artifacts, or a bug fix in a skill's own logic → changelog only.
@@ -47,4 +63,8 @@ The test: *"If I upgrade the plugin and change nothing in my repo, is my repo no
 
 Migration entry ids are permanent: never rename or reuse one, because unstamped repos duck-type against the whole ledger from 0.1.0 forward.
 
-**Process:** bump the three fields → update `CHANGELOG.md` → add a `migrations.md` entry if repo-affecting → commit (include all of it in the same commit as the change) → push. No tags or release artifacts are required today; if that changes, document it here.
+**ppp:** `ppp/CHANGELOG.md` only. PPP bundles are documents in each team's medium, with no repo state to migrate. A release that changes the bundle format says so in its changelog entry.
+
+**Catalog:** a `metadata.version` change gets a line in the catalog note at the top of the root `CHANGELOG.md`.
+
+**Process:** change a plugin → bump its plugin.json → its CHANGELOG (+ fff `migrations.md` if repo-affecting) → if `ppp/` changed, `python3 -m unittest discover -s ppp/tests` passes → if `marketplace.json` changed, bump `metadata.version` and add the catalog note → one commit with all of it → push. No tags or release artifacts today; if that changes, document it here.

@@ -1,0 +1,19 @@
+{
+  "target": ".",
+  "args": [],
+  "exit": 0,
+  "fails": [],
+  "warns": [],
+  "fail_counts": {},
+  "metrics": {
+    "questions": {
+      "open": 1,
+      "answered": 1,
+      "deferred": 1,
+      "dropped": 1
+    },
+    "provisional": 1,
+    "key_decisions": 2,
+    "xl_increments": 1
+  }
+}

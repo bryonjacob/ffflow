@@ -1,0 +1,15 @@
+{
+  "target": ".",
+  "args": [
+    "--shared",
+    "../_shared-tight",
+    "--memo",
+    "memo.md"
+  ],
+  "exit": 0,
+  "fails": [],
+  "warns": [
+    "MEMO"
+  ],
+  "fail_counts": {}
+}
