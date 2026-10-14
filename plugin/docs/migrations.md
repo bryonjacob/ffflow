@@ -259,3 +259,34 @@ Each entry is one repo-affecting change. Entries are ordered oldest-first within
     act, not self-certification of a code change.
   autonomous: false
 ```
+
+### 0.4.3 — repo moved to zerotechdebt/ffflow
+
+```yaml
+- id: ffflow-repo-url
+  version: 0.4.3
+  title: Root CLAUDE.md links FFFlow at github.com/zerotechdebt/ffflow
+  applies_when: root CLAUDE.md exists
+  severity: low
+  detect: |
+    Search root `CLAUDE.md` for either old FFFlow repo URL:
+      - `github.com/bryonjacob/ffflow-plugin` (never existed — a 404)
+      - `github.com/bryonjacob/ffflow` (redirects, but stale)
+    e.g. `grep -nE 'github\.com/bryonjacob/ffflow(-plugin)?\b' CLAUDE.md`.
+    Any hit = gap. No hits = present. Do not touch other `bryonjacob/*`
+    repos (e.g. `bryonjacob/specdrive` is a separate project that did not move).
+  remediate: |
+    Hits inside the `<!-- ffflow:beliefs ... -->` markers: refresh the block
+    from the canonical text in `init-ffflow` (the same remediation as
+    `beliefs-block`; if that entry already ran this upgrade, this is already
+    done). Replace only bytes between the markers.
+
+    Hits outside the markers are human-owned: show each line and offer to
+    replace the URL with `https://github.com/zerotechdebt/ffflow`. Apply only
+    on confirmation.
+
+    Cause: pre-0.4.3 `init-ffflow` stamped `https://github.com/bryonjacob/ffflow-plugin`,
+    a URL that never existed. The repo then moved from `bryonjacob/ffflow` to
+    `zerotechdebt/ffflow`; the canonical block now links there.
+  autonomous: true
+```

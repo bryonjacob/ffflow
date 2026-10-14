@@ -46,7 +46,7 @@ These shape every skill. Full text in [`docs/architecture.md`](docs/architecture
 ## Plugin layout
 
 ```
-ffflow-plugin/                         # repo root (also the marketplace)
+ffflow/                                # repo root (also the marketplace)
 ├── .claude-plugin/
 │   └── marketplace.json               # marketplace entry; source: "./plugin"
 ├── README.md                          # User-facing intro (marketplace level)

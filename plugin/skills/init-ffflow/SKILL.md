@@ -143,10 +143,10 @@ Write the managed block into the project's root `CLAUDE.md`. If no root CLAUDE.m
 This is the canonical text. `upgrade-ffflow` refreshes it from here, so this block is the single source of truth — update it here and the upgrade path follows automatically:
 
 ```markdown
-<!-- ffflow:beliefs v0.4.0 — managed by /fff:upgrade-ffflow. Edits inside this block are overwritten. -->
+<!-- ffflow:beliefs v0.4.3 — managed by /fff:upgrade-ffflow. Edits inside this block are overwritten. -->
 ## FFFlow beliefs
 
-This project runs [FFFlow](https://github.com/bryonjacob/ffflow-plugin). These are the non-negotiables — the rules you should not have to discover.
+This project runs [FFFlow](https://github.com/zerotechdebt/ffflow). These are the non-negotiables — the rules you should not have to discover.
 
 - **Hierarchical CLAUDE.md.** Every significant module carries its own CLAUDE.md — a tree mirroring the module tree, not this root file alone. Adding one to a module that lacks it is *never* a new precedent; it is catching up to the norm. The root file stays a map; module-specific rules live with the module. A 2-line CLAUDE.md beats none. → `/fff:audit --type claude-md`
 - **Specs and tests move together.** A spec entry without a test is documentation; a test without a spec entry is opaque. Spec updates ship in the same PR as the implementation. → `/fff:work-issue`, `/fff:audit --type spec`
