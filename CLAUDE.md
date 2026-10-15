@@ -41,7 +41,9 @@ list, not the plugins:
   content, doc fixes, new stack/language support, new check fixtures.
 - **minor** — new skills, new user-facing capability, or a meaningful workflow addition.
 - **major** — removing or renaming a skill, or breaking a documented interface (recipe names,
-  `--type` values, config schema, PPP's bundle format or check rule codes).
+  `--type` values, config schema, anything in fff's
+  [`plugin/docs/integration-surface.md`](plugin/docs/integration-surface.md), PPP's bundle format or check
+  rule codes).
 
 **Always bump. This is mandatory, not hygiene.** Once a plugin.json carries a version, Claude Code
 decides whether an installed copy is out of date by comparing that string. Users stay on their

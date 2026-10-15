@@ -127,6 +127,7 @@ PPP doesn't depend on fff; a converged PRD can feed any planning step, including
 - [Workflows](plugin/docs/workflows.md) — the lifecycle flows
 - [Audit subsystem](plugin/docs/audit.md) — the keep-honest layer
 - [Migration ledger](plugin/docs/migrations.md) — what `/fff:upgrade-ffflow` reads
+- [Integration surface](plugin/docs/integration-surface.md) — what tools that drive FFFlow (e.g. fffactory) may rely on
 - [Changelog](CHANGELOG.md) — fff release history and catalog notes
 - [PPP design](ppp/CLAUDE.md) — what the ppp plugin is and its invariants
 - [PPP process](ppp/process.md) — the process contract every `/ppp:` skill implements
