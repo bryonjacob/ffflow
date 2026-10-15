@@ -10,6 +10,17 @@ The format is loosely [Keep a Changelog](https://keepachangelog.com/); versionin
 
 ---
 
+## [0.4.4] — 2026-10-15
+
+### Added
+- **[`plugin/docs/integration-surface.md`](plugin/docs/integration-surface.md): what tools that drive FFFlow may rely on.** FFFlow now has an unattended consumer: [fffactory](https://github.com/yaunder/fffactory) dispatches `ready` epics to `/fff:work-epic` on workers it provisions. The doc covers four things:
+  - the plugin's distribution identity
+  - the `.ffflow/config.yaml` adoption keys
+  - how work is found on GitHub: the `ffflow-epic`, `ffflow-task` and `epic-<n>` labels, same-repo `Depends on #<n>` lines, and captured issues that need no laptop plan files
+  - what `/fff:work-epic` guarantees: it works in the current checkout, uses one `epic/<n>` branch, opens a PR that references every task, and never merges
+
+  It reserves the `ready` label for integrators. It names the conventions integrators must *not* parse, so FFFlow stays free to evolve them: title ordinals, the epic checklist, `## Working notes`, and commit and PR-title wording. It also lists integrator needs FFFlow hasn't adopted yet. The root versioning policy now names the doc, so a breaking change to its surface is a major bump. Scope reviewed with fffactory's maintainer on #7.
+
 ## [0.4.3] — 2026-10-14
 
 ### Changed
