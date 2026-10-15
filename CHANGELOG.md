@@ -10,6 +10,15 @@ The format is loosely [Keep a Changelog](https://keepachangelog.com/); versionin
 
 ---
 
+## [0.4.3] — 2026-10-14
+
+### Changed
+- **The repo moved to [`zerotechdebt/ffflow`](https://github.com/zerotechdebt/ffflow).** It was transferred from `bryonjacob/ffflow`, so stars, forks, and issues came with it, and GitHub redirects the old URL. Existing marketplace installs keep updating with no action needed; `/plugin marketplace add zerotechdebt/ffflow` is the install command going forward. The marketplace name (`ffflow`) and plugin names (`fff`, `ppp`) are unchanged.
+
+### Fixed
+- **The beliefs block linked to a repo that never existed.** `init-ffflow`'s canonical block stamped `This project runs [FFFlow](https://github.com/bryonjacob/ffflow-plugin)` into every adopted project's root CLAUDE.md — a 404. It now links `https://github.com/zerotechdebt/ffflow`, and the block's marker moves to `v0.4.3` so `beliefs-block` sees older blocks as stale. New migration entry `ffflow-repo-url` finds the old link in existing projects and replaces it.
+- README install instructions now use `/plugin marketplace add zerotechdebt/ffflow` instead of a local-path placeholder. Repo-layout trees in the design docs name the root `ffflow/`.
+
 ## [0.4.2] — 2026-10-07
 
 ### Fixed

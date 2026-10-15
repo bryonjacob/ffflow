@@ -5,7 +5,7 @@ This repo is a Claude Code marketplace shipping two independent plugins: **fff**
 ## Layout
 
 ```
-ffflow-plugin/
+ffflow/
 ├── .claude-plugin/marketplace.json    # the catalog: lists both plugins; versions only itself
 ├── plugin/                            # fff (source: "./plugin")
 │   ├── .claude-plugin/plugin.json     # fff manifest; fff's version

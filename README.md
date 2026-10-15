@@ -5,7 +5,7 @@ Two independent plugins: **fff** — plan, work, audit, at the level of rigor yo
 ## Install
 
 ```bash
-/plugin marketplace add /path/to/ffflow-plugin
+/plugin marketplace add zerotechdebt/ffflow
 /plugin install fff@ffflow
 /plugin install ppp@ffflow
 ```

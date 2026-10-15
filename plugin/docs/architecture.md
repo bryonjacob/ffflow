@@ -167,7 +167,7 @@ The block states the non-negotiables only — the rules a session must not have 
 ## 3. Plugin Layout
 
 ```
-ffflow-plugin/                         # repo root (also the marketplace)
+ffflow/                                # repo root (also the marketplace)
 ├── .claude-plugin/
 │   └── marketplace.json               # marketplace entry; source: "./plugin"
 ├── README.md                          # User-facing intro (marketplace level)
