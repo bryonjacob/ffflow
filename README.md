@@ -12,6 +12,62 @@ Two independent plugins: **fff** — plan, work, audit, at the level of rigor yo
 
 Commands are namespaced per plugin: `/fff:…` (e.g., `/fff:plan-chat`, `/fff:work-issue`) and `/ppp:…` (e.g., `/ppp:prd-start`, `/ppp:prd-turn`).
 
+### Existing marketplace settings after the repository move
+
+FFFlow moved from `bryonjacob/ffflow` to `zerotechdebt/ffflow`. A new Claude
+instance can still inherit the old marketplace declaration through copied or
+shared settings. If adding the marketplace fails with:
+
+```text
+Cannot add marketplace "ffflow": its network source differs from the one declared for it in settings
+```
+
+the saved source and the install command disagree. Claude compares the source
+type and target (plus any fetch options), even when GitHub redirects both targets
+to the same repository. Updating just the URL of a `git` source does not make it
+match the `github` source used by `zerotechdebt/ffflow` shorthand.
+
+To migrate to the current upstream:
+
+1. Close Claude Code sessions that use the settings and back up the settings file.
+   Find `extraKnownMarketplaces.ffflow` in `~/.claude/settings.json` (or
+   `$CLAUDE_CONFIG_DIR/settings.json` if configured). Also check the project's
+   `.claude/settings.json` and `.claude/settings.local.json` for declarations.
+2. Replace the old entry's **entire `source` object** with the canonical source
+   below. Merge this into the existing file; preserve other marketplaces, other
+   settings, `enabledPlugins`, and options such as `autoUpdate` outside `source`.
+   Align any other old FFFlow declarations in the relevant settings files too.
+
+   ```json
+   {
+     "extraKnownMarketplaces": {
+       "ffflow": {
+         "source": {
+           "source": "github",
+           "repo": "zerotechdebt/ffflow"
+         }
+       }
+     }
+   }
+   ```
+
+   If the source deliberately points to a fork or has a pinned `ref`, custom
+   `path`, `sparsePaths`, or headers, decide whether to keep that configuration
+   before replacing it: those fields also participate in source matching. A
+   managed declaration must be changed by its administrator.
+3. Restart Claude Code, then rerun `/plugin marketplace add zerotechdebt/ffflow`
+   and install either or both plugins with the commands above. The add command
+   now matches the declaration and refreshes the local marketplace registration.
+
+If you want to keep an existing legacy source, use `/plugin marketplace update ffflow`
+to update from that registered source instead of adding it under a new
+source. GitHub redirects the old repository URL, but does not rewrite Claude's
+settings or make differently typed sources equal.
+
+See Claude Code's [marketplace documentation](https://code.claude.com/docs/en/plugin-marketplaces)
+and [settings reference](https://code.claude.com/docs/en/settings) for marketplace
+configuration and settings scopes.
+
 ## fff — FFFlow
 
 **Plan, work, audit — at the level of rigor your project actually needs.**

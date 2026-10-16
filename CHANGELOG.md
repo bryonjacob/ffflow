@@ -10,10 +10,15 @@ The format is loosely [Keep a Changelog](https://keepachangelog.com/); versionin
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- Installation docs now cover saved marketplace source declarations after the repository transfer, including new Claude instances with copied/shared settings. The canonical `github` source and migration steps resolve the source-identity conflict raised by `/plugin marketplace add zerotechdebt/ffflow`; GitHub redirects alone do not resolve it. This changes repository documentation only, with no plugin or catalog release.
+
 ## [0.4.3] — 2026-10-14
 
 ### Changed
-- **The repo moved to [`zerotechdebt/ffflow`](https://github.com/zerotechdebt/ffflow).** It was transferred from `bryonjacob/ffflow`, so stars, forks, and issues came with it, and GitHub redirects the old URL. Existing marketplace installs keep updating with no action needed; `/plugin marketplace add zerotechdebt/ffflow` is the install command going forward. The marketplace name (`ffflow`) and plugin names (`fff`, `ppp`) are unchanged.
+- **The repo moved to [`zerotechdebt/ffflow`](https://github.com/zerotechdebt/ffflow).** It was transferred from `bryonjacob/ffflow`, so stars, forks, and issues came with it, and GitHub redirects the old URL. Existing marketplace installs can update through their registered legacy source; `/plugin marketplace add zerotechdebt/ffflow` is the install command going forward. Adding through this new shorthand requires any saved `ffflow` declaration to match its source type and target; see the [settings migration](README.md#existing-marketplace-settings-after-the-repository-move). The marketplace name (`ffflow`) and plugin names (`fff`, `ppp`) are unchanged.
 
 ### Fixed
 - **The beliefs block linked to a repo that never existed.** `init-ffflow`'s canonical block stamped `This project runs [FFFlow](https://github.com/bryonjacob/ffflow-plugin)` into every adopted project's root CLAUDE.md — a 404. It now links `https://github.com/zerotechdebt/ffflow`, and the block's marker moves to `v0.4.3` so `beliefs-block` sees older blocks as stale. New migration entry `ffflow-repo-url` finds the old link in existing projects and replaces it.
